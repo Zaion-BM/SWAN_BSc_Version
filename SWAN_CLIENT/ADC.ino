@@ -1,7 +1,8 @@
 #include "ADC.h"
 
- float Vin = 0.0;
- float U_Moisture = 0.0;
+ RTC_DATA_ATTR int cnt = 0;
+ float Vin= 0.0;
+ RTC_DATA_ATTR float U_Moisture[5];
  float Ubat = 0.0;
 
  int ADC1_CH0 = 36; //GPIO36, U_Moisture
@@ -10,18 +11,30 @@
 
 
 void ADC_TASK(void *pvParameters){
-  unsigned long delayTime = 2000;    //6*10*1000*1ms = 1min
+  unsigned long delayTime = 60000;    //6*10*1000*1ms = 1min
 
   while(1){
+    digitalWrite(2,LOW);
+    vTaskDelay(500);
+    
     Serial.println();
     Serial.println("ADC_TASK begins");
   
-    U_Moisture = (float)( analogRead(ADC1_CH0) / 4095);
+    U_Moisture[cnt] = (float)( analogRead(ADC1_CH0) / 4095);
+    
+    if(cnt==4){cnt=0;}
+    else{cnt++;}
+    
     Ubat = (float)( analogRead(ADC1_CH3) / 4095);
     Vin = (float)( analogRead(ADC1_CH6) / 4095);
-
+    
+    digitalWrite(2,HIGH);
+    
     Serial.print("Voltage of soil moisture sensor: ");
-    Serial.print(U_Moisture);
+    for(int i=0; i<5;i++){
+      Serial.print(U_Moisture[i]);
+      Serial.print(" ");
+    }
     Serial.println(" V");
 
   

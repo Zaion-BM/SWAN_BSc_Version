@@ -11,7 +11,7 @@ float pressure;
 
 
 void BMP280_TASK(void *pvParameters){
-    unsigned long delayTime = 2000;    //6*10*1000*1ms = 1min
+    unsigned long delayTime = 60000;    //6*10*1000*1ms = 1min
     unsigned long retryTime = 300000;   //5*6*10*1000*1ms = 5min
     bool status;
     
@@ -36,6 +36,7 @@ void BMP280_TASK(void *pvParameters){
     printValues();
     
     BMP280_Sleep(device_address);
+    Serial.println("BME280 to Sleep mode...");
     
     Serial.println("BMP280_TASK ends");
     vTaskDelay(delayTime);
@@ -63,7 +64,6 @@ void BMP280_Sleep(int device_address) {
   //  01 / 10   'Forced' mode, use either '01' or '10'
   //    11      'Normal' mode
   
-  Serial.println("BME280 to Sleep mode...");
   Wire.beginTransmission(device_address);
   Wire.write((uint8_t)0xF4);       // Select Control Measurement Register
   Wire.write((uint8_t)0b00000000); // Send '00' for Sleep mode
