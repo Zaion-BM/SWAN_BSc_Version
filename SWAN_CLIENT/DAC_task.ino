@@ -2,6 +2,8 @@
 
 void DAC_TASK(void *pvParameters){
   int i = 0;
+  Serial.println(F("1.65V reference voltage is set."));
+  dacWrite(26, 127);
 
   static byte WaveFormTable[Num_Samples] = {
    // Sin wave 
