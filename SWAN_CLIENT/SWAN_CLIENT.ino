@@ -4,12 +4,18 @@
 #define ARDUINO_RUNNING_CORE 1
 #endif
 
+#include <WiFi.h>
+#include <PubSubClient.h>
+
 #define uS_TO_S_FACTOR 1000000  /* Conversion factor for micro seconds to seconds */
 #define TIME_TO_SLEEP  10        /* Time ESP32 will go to sleep (in seconds) */
 
 RTC_DATA_ATTR int bootCount = 0;
 
 void Sleep_TASK(void *pvParameters);
+
+WiFiClient espClient;
+PubSubClient client(espClient);
 
 // the setup function runs once when you press reset or power the board
 void setup() {
@@ -21,7 +27,7 @@ void setup() {
   // initialize serial communication at 115200 bits per second:
   Serial.begin(115200);
   
- xTaskCreatePinnedToCore(
+ /*xTaskCreatePinnedToCore(
     BMP280_TASK
     ,  "BMP280Task"   // A name just for humans
     ,  2048  // This stack size can be checked & adjusted by reading the Stack Highwater
@@ -37,25 +43,25 @@ void setup() {
     ,  NULL
     ,  2  // Priority
     ,  NULL 
-    ,  ARDUINO_RUNNING_CORE); 
+    ,  ARDUINO_RUNNING_CORE); */
 
-   xTaskCreatePinnedToCore(
+/*   xTaskCreatePinnedToCore(
     Sleep_TASK
     ,  "Sleep_TASK"
     ,  1024  // Stack size
     ,  NULL
     ,  3  // Priority
     ,  NULL 
-    ,  ARDUINO_RUNNING_CORE);
+    ,  ARDUINO_RUNNING_CORE); */
 
-   xTaskCreatePinnedToCore(
+  /* xTaskCreatePinnedToCore(
     DAC_TASK
     ,  "DAC_TASK"
     ,  1024  // Stack size
     ,  NULL
-    ,  1  // Priority
+    ,  3  // Priority
     ,  NULL 
-    ,  ARDUINO_RUNNING_CORE); 
+    ,  ARDUINO_RUNNING_CORE); */
 
    xTaskCreatePinnedToCore(
     MQTT_TASK
@@ -66,6 +72,7 @@ void setup() {
     ,  NULL 
     ,  ARDUINO_RUNNING_CORE);
   }
+  
   else{
     esp_sleep_enable_timer_wakeup(TIME_TO_SLEEP * uS_TO_S_FACTOR);
     bootCount++;
@@ -76,6 +83,7 @@ void setup() {
 }
 
 void loop(){
+  client.loop();
 }
 
 void Sleep_TASK(void *pvParameters){

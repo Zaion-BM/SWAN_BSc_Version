@@ -2,9 +2,9 @@
 #include <PubSubClient.h>
 
 
-  const char* ssid = "Nori";
-  const char* password = "pAlacsinta88";
-  const char* mqtt_server = "test.mosquitto.org";
+const char* ssid = "Nori";
+const char* password = "pAlacsinta88";
+const char* mqtt_server = "192.168.0.202";
 
 void callback(char* topic, byte* message, unsigned int length) {
     Serial.print("Message arrived on topic: ");
@@ -20,11 +20,9 @@ void callback(char* topic, byte* message, unsigned int length) {
   }
 
 
-  void MQTT_TASK(void *pvParameters){
-  
-  WiFiClient espClient;
-  PubSubClient client(espClient);
 
+
+void MQTT_TASK(void *pvParameters){
   Serial.println();
   Serial.print("Connecting to ");
   Serial.println(ssid);
@@ -43,8 +41,13 @@ void callback(char* topic, byte* message, unsigned int length) {
 
   client.setServer(mqtt_server, 1883);
   client.setCallback(callback);
+  client.connect("SWAN1");
+  client.subscribe("SWAN/recv");
+  Serial.println("MQTT connected");
 
   while(1){
     vTaskDelay(1000);
+   /* client.publish("SWAN/pub", "ESP32 alive...");
+    Serial.println("Publishing...");*/
   }
 }

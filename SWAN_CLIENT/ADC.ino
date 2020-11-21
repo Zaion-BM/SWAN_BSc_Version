@@ -14,6 +14,8 @@ void ADC_TASK(void *pvParameters){
   unsigned long delayTime = 60000;    //6*10*1000*1ms = 1min
 
   while(1){
+    Serial.println(F("1.65V reference voltage is set."));
+    dacWrite(26, 127);
     digitalWrite(2,LOW);
     vTaskDelay(500);
     
