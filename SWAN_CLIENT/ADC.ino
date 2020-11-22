@@ -1,6 +1,5 @@
 #include "ADC.h"
 
- RTC_DATA_ATTR int cnt = 0;
  float Vin= 0.0;
  RTC_DATA_ATTR float U_Moisture[5];
  float Ubat = 0.0;
@@ -11,10 +10,10 @@
 
 
 void ADC_TASK(void *pvParameters){
-  unsigned long delayTime = 60000;    //6*10*1000*1ms = 1min
-
+  
   while(1){
-    Serial.println(F("1.65V reference voltage is set."));
+    if(measurementCounter==5){measurementCounter=0;}
+    
     dacWrite(26, 127);
     digitalWrite(2,LOW);
     vTaskDelay(500);
@@ -22,13 +21,12 @@ void ADC_TASK(void *pvParameters){
     Serial.println();
     Serial.println("ADC_TASK begins");
   
-    U_Moisture[cnt] = (float)( analogRead(ADC1_CH0) / 4095);
-    
-    if(cnt==4){cnt=0;}
-    else{cnt++;}
+    U_Moisture[measurementCounter] = (float)( analogRead(ADC1_CH0) / 4095);
     
     Ubat = (float)( analogRead(ADC1_CH3) / 4095);
     Vin = (float)( analogRead(ADC1_CH6) / 4095);
+
+    if(Vin>0.0 && Ubat > 3.299){digitalWrite(13,HIGH);}
     
     digitalWrite(2,HIGH);
     
@@ -37,17 +35,19 @@ void ADC_TASK(void *pvParameters){
       Serial.print(U_Moisture[i]);
       Serial.print(" ");
     }
-    Serial.println(" V");
+    Serial.print(" V, ");
 
-  
     Serial.print("Battery voltage: ");
     Serial.print(Ubat);
-    Serial.println(" V");
+    Serial.print(" V, ");
 
     Serial.print("PSU voltage: ");
     Serial.print(Vin);
     Serial.println(" V");
-  
+    
+    measurementCounter++;
+    if(measurementCounter == 5 ){vTaskResume(MQTT_TaskHandle);};
+      
 
     Serial.println("ADC_TASK ends");
     vTaskDelay(delayTime);

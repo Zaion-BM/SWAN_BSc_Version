@@ -3,17 +3,17 @@
 
 #include "BMP280_task.h"
 
-Adafruit_BMP280 bmp; // I2C
-
+Adafruit_BMP280 bmp;
 int device_address = 0x76;
-float temp;
-float pressure;
+
+RTC_DATA_ATTR float temp[5];
+RTC_DATA_ATTR float pressure[5];
 
 
 void BMP280_TASK(void *pvParameters){
-    unsigned long delayTime = 60000;    //6*10*1000*1ms = 1min
     unsigned long retryTime = 300000;   //5*6*10*1000*1ms = 5min
     bool status;
+    float avgTemp = 0.0;
     
     status = bmp.begin(device_address);  //I2C address can be 0x77 or 0x76
     
@@ -32,27 +32,40 @@ void BMP280_TASK(void *pvParameters){
     
     bmp.begin(device_address);
     Serial.println("BMP280 to Normal mode...");
+
+    temp[measurementCounter] = bmp.readTemperature();
+    pressure[measurementCounter] = bmp.readPressure() / 100.0F;
+
+    for(int i=0;i<5;i++){
+      avgTemp += temp[i];
+     }
+    avgTemp = avgTemp / 5;
+    if( (avgTemp - 5.0)< 0.01 ){frozen = true;} 
     
     printValues();
     
     BMP280_Sleep(device_address);
     Serial.println("BME280 to Sleep mode...");
-    
+
     Serial.println("BMP280_TASK ends");
     vTaskDelay(delayTime);
   }
 }
 
 void printValues() {
-    Serial.print("Temperature = ");
-    temp = bmp.readTemperature();
-    Serial.print(temp);
-    Serial.println(" *C");
+    Serial.print("Temperature:  ");
+    for(int i=0; i<5;i++){
+      Serial.print(temp[i]);
+      Serial.print(" *C ");
+    }
+    Serial.print(", ");
 
-    Serial.print("Pressure = ");
-    pressure = bmp.readPressure() / 100.0F;
-    Serial.print(pressure);
-    Serial.println(" hPa");
+    Serial.print("Pressure:  ");
+    for(int i=0; i<5;i++){
+      Serial.print(pressure[i]);
+      Serial.print(" hPa ");
+    }
+    Serial.println();
 }
 
 void BMP280_Sleep(int device_address) {

@@ -1,5 +1,7 @@
+#include "MQTT.h"
 #include <WiFi.h>
 #include <PubSubClient.h>
+#include <ArduinoJson.h>
 
 
 const char* ssid = "Nori";
@@ -17,6 +19,16 @@ void callback(char* topic, byte* message, unsigned int length) {
       messageTemp += (char)message[i];
     }
     Serial.println();
+    if( messageTemp == "banned") {
+      Serial.print("I'm banned");
+      Serial.println();
+      banned = true;
+      }
+    if( messageTemp == "buzzer") {
+      Serial.print("I'm lost");
+      Serial.println();
+      lost = true;
+      }
   }
 
 
@@ -45,9 +57,39 @@ void MQTT_TASK(void *pvParameters){
   client.subscribe("SWAN/recv");
   Serial.println("MQTT connected");
 
+  char payload[256];
+
   while(1){
-    vTaskDelay(1000);
-   /* client.publish("SWAN/pub", "ESP32 alive...");
-    Serial.println("Publishing...");*/
+    Serial.println("Publishing...");
+   
+    StaticJsonDocument<256> doc;
+    
+    doc["Client"] = "01";
+    doc["Battery_Voltage"] = Ubat;
+
+    JsonArray temperature = doc.createNestedArray("temp");
+    for(int i=0;i<5;i++){
+      temperature.add(temp[i]);
+    }
+
+    JsonArray pres = doc.createNestedArray("pressure");
+    for(int i=0;i<5;i++){
+      pres.add(pressure[i]);
+    }
+    JsonArray U_mois = doc.createNestedArray("U_moisture");
+    for(int i=0;i<5;i++){
+      U_mois.add(U_Moisture[i]);
+    }
+
+    client.publish("SWAN/pub", payload);
+    
+    serializeJson(doc, payload);
+    Serial.print(payload);
+    Serial.println();
+
+    vTaskDelay(delayTime/2);
+    
+    vTaskResume(buzzer_TaskHandle);
+    vTaskResume(irrigation_TaskHandle);
   }
 }

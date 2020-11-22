@@ -4,94 +4,104 @@
 #define ARDUINO_RUNNING_CORE 1
 #endif
 
+#define uS_TO_S_FACTOR 1000000  /* Conversion factor for micro seconds to seconds */
+#define TIME_TO_SLEEP  30        /* Time ESP32 will go to sleep beetwen every 5 measurements (in seconds) */
+
 #include <WiFi.h>
 #include <PubSubClient.h>
 
-#define uS_TO_S_FACTOR 1000000  /* Conversion factor for micro seconds to seconds */
-#define TIME_TO_SLEEP  10        /* Time ESP32 will go to sleep (in seconds) */
-
 RTC_DATA_ATTR int bootCount = 0;
-
-void Sleep_TASK(void *pvParameters);
+RTC_DATA_ATTR int measurementCounter = 0;
+unsigned long delayTime = 10000;    //6*10*1000*1ms = 1min
+unsigned int serialNumber;
+bool banned = false;
+bool frozen = false;
+bool lost = false;
 
 WiFiClient espClient;
 PubSubClient client(espClient);
 
-// the setup function runs once when you press reset or power the board
+TaskHandle_t bmp280_TaskHandle = NULL;
+TaskHandle_t adc_TaskHandle = NULL;
+TaskHandle_t sleep_TaskHandle = NULL;
+TaskHandle_t buzzer_TaskHandle = NULL;
+TaskHandle_t irrigation_TaskHandle = NULL;
+TaskHandle_t MQTT_TaskHandle = NULL;
+
 void setup() {
-  setCpuFrequencyMhz(80);
+ setCpuFrequencyMhz(80);
   
-  if(bootCount == 0 || bootCount == 2){
-    bootCount = 1;  
+ if(bootCount == 0 || bootCount == 10){
+    bootCount = 1; 
+   
+    Serial.begin(115200);
   
-  // initialize serial communication at 115200 bits per second:
-  Serial.begin(115200);
-  
- /*xTaskCreatePinnedToCore(
-    BMP280_TASK
-    ,  "BMP280Task"   // A name just for humans
-    ,  2048  // This stack size can be checked & adjusted by reading the Stack Highwater
-    ,  NULL
-    ,  2  // Priority, with 3 (configMAX_PRIORITIES - 1) being the highest, and 0 being the lowest.
-    ,  NULL 
-    ,  ARDUINO_RUNNING_CORE);
+    xTaskCreatePinnedToCore(
+      BMP280_TASK
+      ,  "BMP280Task"   
+      ,  2048  
+      ,  NULL
+      ,  3
+      ,  &bmp280_TaskHandle 
+      ,  ARDUINO_RUNNING_CORE);
 
-  xTaskCreatePinnedToCore(
-    ADC_TASK
-    ,  "ADC_TASK"
-    ,  1024  // Stack size
-    ,  NULL
-    ,  2  // Priority
-    ,  NULL 
-    ,  ARDUINO_RUNNING_CORE); */
+    xTaskCreatePinnedToCore(
+      ADC_TASK
+      ,  "ADC_TASK"
+      ,  1024  
+      ,  NULL
+      ,  3  
+      ,  &adc_TaskHandle 
+      ,  ARDUINO_RUNNING_CORE);
 
-/*   xTaskCreatePinnedToCore(
-    Sleep_TASK
-    ,  "Sleep_TASK"
-    ,  1024  // Stack size
-    ,  NULL
-    ,  3  // Priority
-    ,  NULL 
-    ,  ARDUINO_RUNNING_CORE); */
+    xTaskCreatePinnedToCore(
+      sleep_TASK
+      ,  "SleepTASK"
+      ,  1024  
+      ,  NULL
+      ,  2  
+      ,  &sleep_TaskHandle 
+      ,  ARDUINO_RUNNING_CORE); 
+    vTaskSuspend(sleep_TaskHandle);
 
-  /* xTaskCreatePinnedToCore(
-    DAC_TASK
-    ,  "DAC_TASK"
-    ,  1024  // Stack size
-    ,  NULL
-    ,  3  // Priority
-    ,  NULL 
-    ,  ARDUINO_RUNNING_CORE); */
+    xTaskCreatePinnedToCore(
+      buzzer_TASK
+      ,  "BuzzerTask"   
+      ,  1024  
+      ,  NULL
+      ,  1  
+      ,  &buzzer_TaskHandle 
+      ,  ARDUINO_RUNNING_CORE);
+    vTaskSuspend(buzzer_TaskHandle);
 
-   xTaskCreatePinnedToCore(
-    MQTT_TASK
-    ,  "MQTTTask"   
-    ,  5120 // 
-    ,  NULL
-    ,  2  //
-    ,  NULL 
-    ,  ARDUINO_RUNNING_CORE);
+    xTaskCreatePinnedToCore(
+      irrigation_TASK
+      ,  "IrrigationTask"   
+      ,  1024  
+      ,  NULL
+      ,  1  
+      ,  &irrigation_TaskHandle 
+      ,  ARDUINO_RUNNING_CORE);
+    vTaskSuspend(irrigation_TaskHandle);
+
+    xTaskCreatePinnedToCore(
+      MQTT_TASK
+      ,  "MQTTTask"   
+      ,  5120  
+      ,  NULL
+      ,  2  
+      ,  &MQTT_TaskHandle 
+      ,  ARDUINO_RUNNING_CORE);
+    vTaskSuspend(MQTT_TaskHandle);
   }
   
   else{
-    esp_sleep_enable_timer_wakeup(TIME_TO_SLEEP * uS_TO_S_FACTOR);
+    esp_sleep_enable_timer_wakeup(TIME_TO_SLEEP/10 * uS_TO_S_FACTOR);
     bootCount++;
     esp_deep_sleep_start();
     }
-
-  // Now the task scheduler, which takes over control of scheduling individual tasks, is automatically started.
 }
 
 void loop(){
   client.loop();
-}
-
-void Sleep_TASK(void *pvParameters){
-  while(1){
-    vTaskDelay(1000);
-    Serial.println();
-    Serial.println(F("SWAN Client enters deep sleep ..."));
-    esp_sleep_enable_timer_wakeup(TIME_TO_SLEEP * uS_TO_S_FACTOR);
-    esp_deep_sleep_start();
-  }
 }
