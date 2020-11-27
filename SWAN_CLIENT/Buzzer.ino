@@ -3,6 +3,7 @@
 void buzzer_TASK(void *pvParameters){
     const byte buzzerInputGPIO = 33;
     pinMode(buzzerInputGPIO, OUTPUT);
+    vTaskDelay(1000);
 
     Serial.println("Buzzer task starts.");
     while(lost){ //If lost activate buzzer sound (~400 Hz)

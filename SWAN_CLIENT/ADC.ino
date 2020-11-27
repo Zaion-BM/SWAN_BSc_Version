@@ -50,6 +50,7 @@ void ADC_TASK(void *pvParameters){
     if(measurementCounter == 5 ){
       xSemaphoreGive(measurementMutex);
       vTaskResume(MQTT_TaskHandle);
+      vTaskResume(irrigation_TaskHandle);
       };
       
     Serial.println("ADC_TASK ends");

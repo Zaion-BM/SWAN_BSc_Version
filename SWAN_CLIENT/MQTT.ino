@@ -26,11 +26,12 @@ void callback(char* topic, byte* message, unsigned int length) {
     if( messageTemp == "buzzer") {
       Serial.print("I'm lost");
       Serial.println();
-      //lost = true;
+      lost = true;
       }
   }
 
 void MQTT_TASK(void *pvParameters){
+  vTaskDelay(10);
   Serial.println();
   Serial.print("Connecting to ");
   Serial.println(ssid);
@@ -87,9 +88,8 @@ void MQTT_TASK(void *pvParameters){
     xSemaphoreGive(measurementMutex);
 
     vTaskDelay(delayTime/2);
-    
+   
     vTaskResume(buzzer_TaskHandle);
-    vTaskResume(irrigation_TaskHandle);
   }
   while(1){vTaskDelay(delayTime);}
 }

@@ -5,7 +5,7 @@
 #endif
 
 #define uS_TO_S_FACTOR 1000000  
-#define TIME_TO_SLEEP  30        
+#define TIME_TO_SLEEP  900        
 
 #include <WiFi.h>
 #include <PubSubClient.h>
@@ -14,9 +14,8 @@
 
 #define EEPROM_SIZE 1
 
-RTC_DATA_ATTR int bootCount = 0;
 RTC_DATA_ATTR int measurementCounter = 0;
-unsigned long delayTime = 10000;    //6*10*1000*1ms = 1min
+unsigned long delayTime = 60000;    //6*10*1000*1ms = 1min
 unsigned int serialNumber;
 bool banned = false;
 bool frozen = false;
@@ -36,24 +35,22 @@ TaskHandle_t MQTT_TaskHandle = NULL;
 SemaphoreHandle_t measurementMutex;
 
 void setup() {
- setCpuFrequencyMhz(80);
- Serial.begin(115200);
- EEPROM.begin(EEPROM_SIZE);
- serialNumber = EEPROM.read(0);
- if(serialNumber == 255){ 
-  getSerialNumber();
-  serialNumber = EEPROM.read(0);
-  Serial.print(" SerialNumber: ");
-  Serial.println(serialNumber);
-  delay(10);
-  ESP.restart();
-  }
   
- if(bootCount == 0 || bootCount == 10){
-    bootCount = 1; 
-   
+    setCpuFrequencyMhz(80);
+  
     Serial.begin(115200);
-
+    EEPROM.begin(EEPROM_SIZE);
+    serialNumber = EEPROM.read(0);
+ 
+    if(serialNumber == 255){ 
+        getSerialNumber();
+        serialNumber = EEPROM.read(0);
+        Serial.print(" SerialNumber: ");
+        Serial.println(serialNumber);
+        delay(10);
+        ESP.restart();
+        }
+   
     measurementMutex = xSemaphoreCreateMutex();
   
     xTaskCreatePinnedToCore(
@@ -89,7 +86,7 @@ void setup() {
       ,  "BuzzerTask"   
       ,  1024  
       ,  NULL
-      ,  1  
+      ,  2  
       ,  &buzzer_TaskHandle 
       ,  ARDUINO_RUNNING_CORE);
     vTaskSuspend(buzzer_TaskHandle);
@@ -113,13 +110,6 @@ void setup() {
       ,  &MQTT_TaskHandle 
       ,  ARDUINO_RUNNING_CORE);
     vTaskSuspend(MQTT_TaskHandle);
-  }
-  
-  else{
-    esp_sleep_enable_timer_wakeup(TIME_TO_SLEEP/10 * uS_TO_S_FACTOR);
-    bootCount++;
-    esp_deep_sleep_start();
-    }
 }
 
 void loop(){
