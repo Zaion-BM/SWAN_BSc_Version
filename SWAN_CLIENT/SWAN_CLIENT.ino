@@ -4,11 +4,15 @@
 #define ARDUINO_RUNNING_CORE 1
 #endif
 
-#define uS_TO_S_FACTOR 1000000  /* Conversion factor for micro seconds to seconds */
-#define TIME_TO_SLEEP  30        /* Time ESP32 will go to sleep beetwen every 5 measurements (in seconds) */
+#define uS_TO_S_FACTOR 1000000  
+#define TIME_TO_SLEEP  30        
 
 #include <WiFi.h>
 #include <PubSubClient.h>
+#include <EEPROM.h>
+#include "getSerialNumber.h"
+
+#define EEPROM_SIZE 1
 
 RTC_DATA_ATTR int bootCount = 0;
 RTC_DATA_ATTR int measurementCounter = 0;
@@ -17,6 +21,7 @@ unsigned int serialNumber;
 bool banned = false;
 bool frozen = false;
 bool lost = false;
+int irrigatonStatus;
 
 WiFiClient espClient;
 PubSubClient client(espClient);
@@ -28,13 +33,28 @@ TaskHandle_t buzzer_TaskHandle = NULL;
 TaskHandle_t irrigation_TaskHandle = NULL;
 TaskHandle_t MQTT_TaskHandle = NULL;
 
+SemaphoreHandle_t measurementMutex;
+
 void setup() {
  setCpuFrequencyMhz(80);
+ Serial.begin(115200);
+ EEPROM.begin(EEPROM_SIZE);
+ serialNumber = EEPROM.read(0);
+ if(serialNumber == 255){ 
+  getSerialNumber();
+  serialNumber = EEPROM.read(0);
+  Serial.print(" SerialNumber: ");
+  Serial.println(serialNumber);
+  delay(10);
+  ESP.restart();
+  }
   
  if(bootCount == 0 || bootCount == 10){
     bootCount = 1; 
    
     Serial.begin(115200);
+
+    measurementMutex = xSemaphoreCreateMutex();
   
     xTaskCreatePinnedToCore(
       BMP280_TASK

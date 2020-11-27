@@ -8,11 +8,14 @@
  int ADC1_CH3 = 39; //GPIO39, Ubat
  int ADC1_CH6 = 34; //GPIO34, Vin
 
-
 void ADC_TASK(void *pvParameters){
+
+  xSemaphoreTake(measurementMutex, portMAX_DELAY); 
   
   while(1){
-    if(measurementCounter==5){measurementCounter=0;}
+    if(measurementCounter==5){
+      measurementCounter=0;
+      }
     
     dacWrite(26, 127);
     digitalWrite(2,LOW);
@@ -25,8 +28,6 @@ void ADC_TASK(void *pvParameters){
     
     Ubat = (float)( analogRead(ADC1_CH3) / 4095);
     Vin = (float)( analogRead(ADC1_CH6) / 4095);
-
-    if(Vin>0.0 && Ubat > 3.299){digitalWrite(13,HIGH);}
     
     digitalWrite(2,HIGH);
     
@@ -36,7 +37,7 @@ void ADC_TASK(void *pvParameters){
       Serial.print(" ");
     }
     Serial.print(" V, ");
-
+    
     Serial.print("Battery voltage: ");
     Serial.print(Ubat);
     Serial.print(" V, ");
@@ -46,9 +47,11 @@ void ADC_TASK(void *pvParameters){
     Serial.println(" V");
     
     measurementCounter++;
-    if(measurementCounter == 5 ){vTaskResume(MQTT_TaskHandle);};
+    if(measurementCounter == 5 ){
+      xSemaphoreGive(measurementMutex);
+      vTaskResume(MQTT_TaskHandle);
+      };
       
-
     Serial.println("ADC_TASK ends");
     vTaskDelay(delayTime);
   }

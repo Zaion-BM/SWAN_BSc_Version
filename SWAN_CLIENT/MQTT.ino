@@ -3,7 +3,6 @@
 #include <PubSubClient.h>
 #include <ArduinoJson.h>
 
-
 const char* ssid = "Nori";
 const char* password = "pAlacsinta88";
 const char* mqtt_server = "192.168.0.202";
@@ -27,12 +26,9 @@ void callback(char* topic, byte* message, unsigned int length) {
     if( messageTemp == "buzzer") {
       Serial.print("I'm lost");
       Serial.println();
-      lost = true;
+      //lost = true;
       }
   }
-
-
-
 
 void MQTT_TASK(void *pvParameters){
   Serial.println();
@@ -57,15 +53,16 @@ void MQTT_TASK(void *pvParameters){
   client.subscribe("SWAN/recv");
   Serial.println("MQTT connected");
 
-  char payload[256];
+  char payload[512];
 
-  while(1){
+  if(xSemaphoreTake( measurementMutex, ( TickType_t ) 10 ) == pdTRUE){
     Serial.println("Publishing...");
    
-    StaticJsonDocument<256> doc;
+    StaticJsonDocument<512> doc;
     
-    doc["Client"] = "01";
+    doc["Client"] = serialNumber;
     doc["Battery_Voltage"] = Ubat;
+    doc["status"] = irrigatonStatus;
 
     JsonArray temperature = doc.createNestedArray("temp");
     for(int i=0;i<5;i++){
@@ -80,16 +77,19 @@ void MQTT_TASK(void *pvParameters){
     for(int i=0;i<5;i++){
       U_mois.add(U_Moisture[i]);
     }
-
+      
+    serializeJson(doc, payload);
     client.publish("SWAN/pub", payload);
     
-    serializeJson(doc, payload);
     Serial.print(payload);
     Serial.println();
+
+    xSemaphoreGive(measurementMutex);
 
     vTaskDelay(delayTime/2);
     
     vTaskResume(buzzer_TaskHandle);
     vTaskResume(irrigation_TaskHandle);
   }
+  while(1){vTaskDelay(delayTime);}
 }
