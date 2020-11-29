@@ -1,0 +1,1 @@
+DELETE FROM SWAN WHERE TIMESTAMP <= strftime('%s','now', '-30 days')*1000
