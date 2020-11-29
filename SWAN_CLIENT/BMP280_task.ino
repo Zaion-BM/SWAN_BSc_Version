@@ -3,27 +3,28 @@
 
 #include "BMP280_task.h"
 
-Adafruit_BMP280 bmp;
-int device_address = 0x76;
+Adafruit_BMP280 bmp; //variable for sensor
+int device_address = 0x76; //I2C address
 
-RTC_DATA_ATTR float temp[5];
-RTC_DATA_ATTR float pressure[5];
+RTC_DATA_ATTR float temp[5]; //Temperature values [°C]
+RTC_DATA_ATTR float pressure[5]; //Pressure values [hPa]
 
 
 void BMP280_TASK(void *pvParameters){
     unsigned long retryTime = 300000;   //5*6*10*1000*1ms = 5min
-    bool status;
-    float avgTemp;
-    
-    status = bmp.begin(device_address);  //I2C address can be 0x77 or 0x76
+    bool status; //I2C device status
+    float avgTemp; //Average temperature [°C]
+     
+    status = bmp.begin(device_address);  //Start I2C communication
     
     if (!status) {
-        Serial.println("Could not find sensor, check PCB connection!");
-        while (1){
+        Serial.println("Could not find sensor!");
+        while (1){//Periodically attempt to find sensor
           vTaskDelay(retryTime);
           };
     }
 
+    //Sleep to save power
     BMP280_Sleep(0x76);
 
     while(1) {
@@ -33,17 +34,22 @@ void BMP280_TASK(void *pvParameters){
     bmp.begin(device_address);
     Serial.println("BMP280 to Normal mode...");
 
-    temp[measurementCounter] = bmp.readTemperature();
-    pressure[measurementCounter] = bmp.readPressure() / 100.0F;
+    if(measurementCounter <5){//Read measurements in normal mode
+       temp[measurementCounter] = bmp.readTemperature();
+       pressure[measurementCounter] = bmp.readPressure() / 100.0F;
+      }
 
     for(int i=0;i<5;i++){
-      avgTemp += temp[i];
+      avgTemp += temp[i]; //Calculate average temperature
      }
     avgTemp = avgTemp / 5;
+
+    //If temperature is under 5°C, ambient temperature can be below 0°C
     if( (avgTemp - 5.0)< 0.01 ){frozen = true;} 
     
     printValues();
-    
+
+    //Sleep to save power
     BMP280_Sleep(device_address);
     Serial.println("BME280 to Sleep mode...");
 
@@ -52,7 +58,7 @@ void BMP280_TASK(void *pvParameters){
   }
 }
 
-void printValues() {
+void printValues() {//UART logging
     Serial.print("Temperature:  ");
     for(int i=0; i<5;i++){
       Serial.print(temp[i]);
