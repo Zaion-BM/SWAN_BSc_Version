@@ -1,970 +1,1741 @@
 [
     {
-        id 6d59f1a.522131,
-        type tab,
-        label SWAN SERVER
+        "id": "6d59f1a.522131",
+        "type": "tab",
+        "label": "SWAN SERVER"
     },
     {
-        id 9f06d6cf.0f4e88,
-        type mqtt in,
-        z 6d59f1a.522131,
-        name ,
-        topic SWANpub,
-        qos 2,
-        broker 2fd62e77.0339c2,
-        x 227.51251983642578,
-        y 179.33749866485596,
-        wires [
-            [
-                a1d3fe8f.8ebaf
-            ]
-        ]
+        "id": "a48d3306.174f2",
+        "type": "subflow",
+        "name": "SaveChart",
+        "info": "",
+        "in": [],
+        "out": []
     },
     {
-        id 8bed1c18.49a33,
-        type mqtt out,
-        z 6d59f1a.522131,
-        name ,
-        topic SWANrecv,
-        qos 1,
-        retain false,
-        broker 28a5b569.d77cba,
-        x 722.5062255859375,
-        y 625.1937255859375,
-        wires []
-    },
-    {
-        id eaddb61c.071e78,
-        type function,
-        z 6d59f1a.522131,
-        name Irrigation ban control,
-        func if (msg.payload === true){n    msg.payload = banned;n}nelse {n    msg.payload = enabled;n}nnreturn msg;,
-        outputs 1,
-        noerr 0,
-        x 528,
-        y 590,
-        wires [
-            [
-                8bed1c18.49a33,
-                a661d9ad.96fbb8
-            ]
-        ]
-    },
-    {
-        id a1d3fe8f.8ebaf,
-        type json,
-        z 6d59f1a.522131,
-        name ,
-        x 406.0000228881836,
-        y 175.00000476837158,
-        wires [
-            [
-                763a9912.36eb48
-            ]
-        ]
-    },
-    {
-        id ae71a16c.27909,
-        type sqlite,
-        z 6d59f1a.522131,
-        mydb ba3e9611.084d58,
-        name Insert to table,
-        x 1016.0000381469727,
-        y 112.00001049041748,
-        wires [
-            [
-                62ed1138.d3cac
-            ]
-        ]
-    },
-    {
-        id 62ed1138.d3cac,
-        type debug,
-        z 6d59f1a.522131,
-        name ,
-        active true,
-        console false,
-        complete false,
-        x 1187.0000381469727,
-        y 114.00001049041748,
-        wires []
-    },
-    {
-        id 60c050d.4ebedb,
-        type function,
-        z 6d59f1a.522131,
-        name SQL statement,
-        func var topic =  INSERT INTO SWAN (ID,moisture,temperature,pressure,status,battery) VALUES ('+msg.payload[0]+','+msg.payload[1]+','+msg.payload[2]+','+msg.payload[3]+','+msg.payload[4]+','+msg.payload[5]+');nvar newmsg={}nnewmsg.topic = topic;nreturn newmsg;,
-        outputs 1,
-        noerr 0,
-        x 829.0000228881836,
-        y 110.00000476837158,
-        wires [
-            [
-                ae71a16c.27909
-            ]
-        ]
-    },
-    {
-        id 6b913cb9.7caf74,
-        type function,
-        z 6d59f1a.522131,
-        name BuzzerControl,
-        func if (msg.payload === true){n    msg.payload = lost;n}nelse {n    msg.payload = found;n}nnreturn msg;,
-        outputs 1,
-        noerr 0,
-        x 1260.4875411987305,
-        y 594.225004196167,
-        wires [
-            [
-                530ed1bd.e06dd,
-                11c18dc3.34dbd2
-            ]
-        ]
-    },
-    {
-        id 763a9912.36eb48,
-        type function,
-        z 6d59f1a.522131,
-        name Parse JSON,
-        func var avgtemp;nvar avgmoist;nvar avgpres;nvar status= msg.payload.status;nvar id=msg.payload.Client;nvar battery = msg.payload.Battery_Voltage;nnavgtemp = (msg.payload.temp[0]+msg.payload.temp[1]+msg.payload.temp[2]+msg.payload.temp[3]+msg.payload.temp[4])5;navgpres = (msg.payload.pressure[0]+msg.payload.pressure[1]+msg.payload.pressure[2]+msg.payload.pressure[3]+msg.payload.pressure[4])5;navgmoist = (msg.payload.U_moisture[0]+msg.payload.U_moisture[1]+msg.payload.U_moisture[2]+msg.payload.U_moisture[3]+msg.payload.U_moisture[4])5;nnntemp = avgtemp.toFixed(2);npres = avgpres.toFixed(2);nmoist = avgmoist.toFixed(2);nnvar data = {payload [id,moist,temp,pres,status,battery]};nnreturn data;,
-        outputs 1,
-        noerr 0,
-        x 560.0000228881836,
-        y 179.00000476837158,
-        wires [
-            [
-                60c050d.4ebedb,
-                2269c0e3.3a41f,
-                5b749fcb.7c33,
-                46115a7e.d26234,
-                44c871d1.ea296
-            ]
-        ]
-    },
-    {
-        id 39c7b78f.20f178,
-        type ui_chart,
-        z 6d59f1a.522131,
-        name ,
-        group 13e6c784.070128,
-        order 0,
-        width 0,
-        height 0,
-        label Ambient temperature [°C],
-        chartType line,
-        legend true,
-        xformat HHmmss,
-        interpolate linear,
-        nodata ,
-        ymin ,
-        ymax ,
-        removeOlder 1,
-        removeOlderPoints ,
-        removeOlderUnit 86400,
-        cutout 0,
-        colors [
-            #1f77b4,
-            #aec7e8,
-            #ff7f0e,
-            #2ca02c,
-            #98df8a,
-            #d62728,
-            #ff9896,
-            #9467bd,
-            #c5b0d5
+        "id": "36cda2f3.36d9ae",
+        "type": "subflow",
+        "name": "SaveChart",
+        "info": "",
+        "in": [
+            {
+                "x": 80,
+                "y": 60,
+                "wires": [
+                    {
+                        "id": "7139e1ed.ec0d4"
+                    }
+                ]
+            }
         ],
-        x 1093.3483505249023,
-        y 239.72284412384033,
-        wires [
+        "out": [
+            {
+                "x": 820,
+                "y": 80,
+                "wires": [
+                    {
+                        "id": "59c36c07.6c9764",
+                        "port": 0
+                    }
+                ]
+            }
+        ]
+    },
+    {
+        "id": "2201aa0e.e4e236",
+        "type": "subflow",
+        "name": "SaveChart (2)",
+        "info": "",
+        "in": [
+            {
+                "x": 80,
+                "y": 60,
+                "wires": [
+                    {
+                        "id": "5a6c68b8.86ef08"
+                    }
+                ]
+            }
+        ],
+        "out": [
+            {
+                "x": 820,
+                "y": 80,
+                "wires": [
+                    {
+                        "id": "d5c6dbf3.72bd18",
+                        "port": 0
+                    }
+                ]
+            }
+        ]
+    },
+    {
+        "id": "55af1125.23df4",
+        "type": "subflow",
+        "name": "Persistence Helper",
+        "info": "",
+        "in": [
+            {
+                "x": 45.5,
+                "y": 85,
+                "wires": [
+                    {
+                        "id": "b2326dac.f1943"
+                    }
+                ]
+            }
+        ],
+        "out": [
+            {
+                "x": 749.5,
+                "y": 53,
+                "wires": [
+                    {
+                        "id": "dea1a0be.3e69",
+                        "port": 0
+                    }
+                ]
+            },
+            {
+                "x": 755,
+                "y": 169,
+                "wires": [
+                    {
+                        "id": "e3ba1fd5.46f05",
+                        "port": 0
+                    }
+                ]
+            }
+        ]
+    },
+    {
+        "id": "904aa569.f42e48",
+        "type": "ui_group",
+        "z": "",
+        "name": "Main Lamp",
+        "tab": "",
+        "order": 1,
+        "disp": true,
+        "width": "6"
+    },
+    {
+        "id": "68b9bc04.cb10d4",
+        "type": "ui_group",
+        "z": "",
+        "name": "Bench Light",
+        "tab": "",
+        "order": 2,
+        "disp": true,
+        "width": "6"
+    },
+    {
+        "id": "b74ac5c5.56ded8",
+        "type": "ui_group",
+        "z": "",
+        "name": "MiFlora",
+        "tab": "",
+        "order": 2,
+        "disp": true,
+        "width": "6"
+    },
+    {
+        "id": "3c072315.335ebc",
+        "type": "ui_group",
+        "z": "",
+        "name": "Report",
+        "tab": "",
+        "order": 2,
+        "disp": true,
+        "width": "18"
+    },
+    {
+        "id": "c478907e.d3049",
+        "type": "ui_group",
+        "z": "",
+        "name": "Selection",
+        "tab": "",
+        "order": 1,
+        "disp": true,
+        "width": "5"
+    },
+    {
+        "id": "7eb5b27a.fe733c",
+        "type": "ui_group",
+        "z": "",
+        "name": "MiFlora",
+        "tab": "",
+        "order": 2,
+        "disp": true,
+        "width": "6"
+    },
+    {
+        "id": "a9164fa0.137b5",
+        "type": "ui_group",
+        "z": "",
+        "name": "Report",
+        "tab": "",
+        "order": 2,
+        "disp": true,
+        "width": "18"
+    },
+    {
+        "id": "6aa99c76.f6add4",
+        "type": "ui_group",
+        "z": "",
+        "name": "Selection",
+        "tab": "",
+        "order": 1,
+        "disp": true,
+        "width": "5"
+    },
+    {
+        "id": "101d968b.b667e9",
+        "type": "sqlitedb",
+        "z": "",
+        "db": "/home/pi/dbs/iot.sav"
+    },
+    {
+        "id": "21aa85af.463e7a",
+        "type": "ui_base",
+        "theme": {
+            "name": "theme-light",
+            "lightTheme": {
+                "default": "#0094CE",
+                "baseColor": "#0094CE",
+                "baseFont": "Helvetica Neue",
+                "edited": true,
+                "reset": false
+            },
+            "darkTheme": {
+                "default": "#097479",
+                "baseColor": "#097479",
+                "baseFont": "Helvetica Neue",
+                "edited": false
+            },
+            "customTheme": {
+                "name": "",
+                "default": "#4B7930",
+                "baseColor": "#4B7930",
+                "baseFont": "Helvetica Neue"
+            },
+            "themeState": {
+                "base-color": {
+                    "default": "#0094CE",
+                    "value": "#0094CE",
+                    "edited": false
+                },
+                "page-titlebar-backgroundColor": {
+                    "value": "#0094CE",
+                    "edited": false
+                },
+                "page-backgroundColor": {
+                    "value": "#fafafa",
+                    "edited": false
+                },
+                "page-sidebar-backgroundColor": {
+                    "value": "#ffffff",
+                    "edited": false
+                },
+                "group-textColor": {
+                    "value": "#000000",
+                    "edited": false
+                },
+                "group-borderColor": {
+                    "value": "#ffffff",
+                    "edited": false
+                },
+                "group-backgroundColor": {
+                    "value": "#ffffff",
+                    "edited": false
+                },
+                "widget-textColor": {
+                    "value": "#111111",
+                    "edited": false
+                },
+                "widget-backgroundColor": {
+                    "value": "#0094ce",
+                    "edited": false
+                },
+                "widget-borderColor": {
+                    "value": "#ffffff",
+                    "edited": false
+                }
+            }
+        },
+        "site": {
+            "name": "Node-RED Dashboard",
+            "hideToolbar": "false",
+            "allowSwipe": "true",
+            "dateFormat": "DD/MM/YYYY",
+            "sizes": {
+                "sx": 48,
+                "sy": 48,
+                "gx": 6,
+                "gy": 6,
+                "cx": 6,
+                "cy": 6,
+                "px": 0,
+                "py": 0
+            }
+        }
+    },
+    {
+        "id": "4ee076c3.476788",
+        "type": "ui_tab",
+        "z": "",
+        "name": "SWAN_SERVER",
+        "icon": "dashboard",
+        "order": 1
+    },
+    {
+        "id": "28a5b569.d77cba",
+        "type": "mqtt-broker",
+        "z": "",
+        "broker": "localhost",
+        "port": "1883",
+        "clientid": "",
+        "usetls": false,
+        "compatmode": true,
+        "keepalive": "60",
+        "cleansession": true,
+        "willTopic": "",
+        "willQos": "0",
+        "willPayload": "",
+        "birthTopic": "",
+        "birthQos": "0",
+        "birthPayload": ""
+    },
+    {
+        "id": "2fd62e77.0339c2",
+        "type": "mqtt-broker",
+        "z": "",
+        "broker": "localhost",
+        "port": "1883",
+        "clientid": "",
+        "usetls": false,
+        "compatmode": true,
+        "keepalive": "60",
+        "cleansession": true,
+        "willTopic": "",
+        "willQos": "0",
+        "willPayload": "",
+        "birthTopic": "",
+        "birthQos": "0",
+        "birthPayload": ""
+    },
+    {
+        "id": "13e6c784.070128",
+        "type": "ui_group",
+        "z": "",
+        "name": "Temperature",
+        "tab": "4ee076c3.476788",
+        "order": 1,
+        "disp": false,
+        "width": "6"
+    },
+    {
+        "id": "ba3e9611.084d58",
+        "type": "sqlitedb",
+        "z": "",
+        "db": "/home/pi/dbs/iot.db"
+    },
+    {
+        "id": "3909b3bd.12578c",
+        "type": "ui_group",
+        "z": "",
+        "name": "Charts",
+        "tab": "",
+        "order": 2,
+        "disp": false,
+        "width": "6"
+    },
+    {
+        "id": "e03831ef.fdf1d",
+        "type": "ui_group",
+        "z": "",
+        "name": "Inputs",
+        "tab": "",
+        "order": 1,
+        "disp": false,
+        "width": "6"
+    },
+    {
+        "id": "1aeb1b2.3d0fce5",
+        "type": "ui_group",
+        "z": "",
+        "name": "Group 3",
+        "tab": "",
+        "order": 3,
+        "disp": false,
+        "width": "6"
+    },
+    {
+        "id": "ee75e6ff.cdff38",
+        "type": "ui_group",
+        "z": "",
+        "name": "Gauge",
+        "tab": "",
+        "order": 2,
+        "disp": true,
+        "width": "6"
+    },
+    {
+        "id": "3b63c237.23a45e",
+        "type": "ui_group",
+        "z": "",
+        "name": "Moisture",
+        "tab": "4ee076c3.476788",
+        "order": 2,
+        "disp": false,
+        "width": "6"
+    },
+    {
+        "id": "3ae508d0.221808",
+        "type": "ui_group",
+        "z": "",
+        "name": "Pressure",
+        "tab": "4ee076c3.476788",
+        "order": 3,
+        "disp": false,
+        "width": "6"
+    },
+    {
+        "id": "41019c81.cdabc4",
+        "type": "ui_group",
+        "z": "",
+        "name": "Temperature",
+        "tab": "4ee076c3.476788",
+        "order": 4,
+        "disp": false,
+        "width": "6"
+    },
+    {
+        "id": "f3ee1910.217358",
+        "type": "ui_group",
+        "z": "",
+        "name": "Status",
+        "tab": "4ee076c3.476788",
+        "order": 5,
+        "disp": false,
+        "width": "6"
+    },
+    {
+        "id": "dafef2b4.2f5c4",
+        "type": "ui_group",
+        "z": "",
+        "name": "Button",
+        "tab": "4ee076c3.476788",
+        "order": 6,
+        "disp": false,
+        "width": "6"
+    },
+    {
+        "id": "6e943d56.2c6824",
+        "type": "ui_group",
+        "z": "",
+        "name": "Charts",
+        "tab": "",
+        "order": 2,
+        "disp": false,
+        "width": "6"
+    },
+    {
+        "id": "13cbbe6.cf96c42",
+        "type": "ui_group",
+        "z": "",
+        "name": "Inputs",
+        "tab": "",
+        "order": 1,
+        "disp": false,
+        "width": "6"
+    },
+    {
+        "id": "134e68fa.ba64c7",
+        "type": "ui_group",
+        "z": "",
+        "name": "Group 3",
+        "tab": "",
+        "order": 3,
+        "disp": false,
+        "width": "6"
+    },
+    {
+        "id": "36b02a4d.c788d6",
+        "type": "ui_base",
+        "theme": {
+            "name": "theme-light",
+            "lightTheme": {
+                "default": "#0094CE",
+                "baseColor": "#0094CE",
+                "baseFont": "-apple-system,BlinkMacSystemFont,Segoe UI,Roboto,Oxygen-Sans,Ubuntu,Cantarell,Helvetica Neue,sans-serif",
+                "edited": true,
+                "reset": false
+            },
+            "darkTheme": {
+                "default": "#097479",
+                "baseColor": "#097479",
+                "baseFont": "-apple-system,BlinkMacSystemFont,Segoe UI,Roboto,Oxygen-Sans,Ubuntu,Cantarell,Helvetica Neue,sans-serif",
+                "edited": false
+            },
+            "customTheme": {
+                "name": "Untitled Theme 1",
+                "default": "#4B7930",
+                "baseColor": "#4B7930",
+                "baseFont": "-apple-system,BlinkMacSystemFont,Segoe UI,Roboto,Oxygen-Sans,Ubuntu,Cantarell,Helvetica Neue,sans-serif"
+            },
+            "themeState": {
+                "base-color": {
+                    "default": "#0094CE",
+                    "value": "#0094CE",
+                    "edited": false
+                },
+                "page-titlebar-backgroundColor": {
+                    "value": "#0094CE",
+                    "edited": false
+                },
+                "page-backgroundColor": {
+                    "value": "#fafafa",
+                    "edited": false
+                },
+                "page-sidebar-backgroundColor": {
+                    "value": "#ffffff",
+                    "edited": false
+                },
+                "group-textColor": {
+                    "value": "#1bbfff",
+                    "edited": false
+                },
+                "group-borderColor": {
+                    "value": "#ffffff",
+                    "edited": false
+                },
+                "group-backgroundColor": {
+                    "value": "#ffffff",
+                    "edited": false
+                },
+                "widget-textColor": {
+                    "value": "#111111",
+                    "edited": false
+                },
+                "widget-backgroundColor": {
+                    "value": "#0094ce",
+                    "edited": false
+                },
+                "widget-borderColor": {
+                    "value": "#ffffff",
+                    "edited": false
+                },
+                "base-font": {
+                    "value": "-apple-system,BlinkMacSystemFont,Segoe UI,Roboto,Oxygen-Sans,Ubuntu,Cantarell,Helvetica Neue,sans-serif"
+                }
+            }
+        },
+        "site": {
+            "name": "Node-RED Dashboard",
+            "hideToolbar": "false",
+            "allowSwipe": "false",
+            "allowTempTheme": "true",
+            "dateFormat": "DD/MM/YYYY",
+            "sizes": {
+                "sx": 48,
+                "sy": 48,
+                "gx": 6,
+                "gy": 6,
+                "cx": 6,
+                "cy": 6,
+                "px": 0,
+                "py": 0
+            }
+        }
+    },
+    {
+        "id": "382b7af.36f1086",
+        "type": "ui_group",
+        "z": "",
+        "name": "demo 1",
+        "tab": "",
+        "order": 1,
+        "disp": false,
+        "width": "12"
+    },
+    {
+        "id": "cb7ecce0.4459a",
+        "type": "ui_group",
+        "z": "",
+        "name": "demo 3",
+        "tab": "",
+        "order": 1,
+        "disp": false,
+        "width": "12"
+    },
+    {
+        "id": "ca86e2e5.1ab59",
+        "type": "ui_group",
+        "z": "",
+        "name": "demo 2",
+        "tab": "",
+        "order": 1,
+        "disp": false,
+        "width": "12"
+    },
+    {
+        "id": "29a3f648.935d5a",
+        "type": "ui_tab",
+        "z": "",
+        "name": "Database",
+        "icon": "dashboard",
+        "order": 2
+    },
+    {
+        "id": "47a2bc87.45d204",
+        "type": "ui_group",
+        "z": "",
+        "name": "Table",
+        "tab": "29a3f648.935d5a",
+        "order": 1,
+        "disp": true,
+        "width": "22"
+    },
+    {
+        "id": "9f06d6cf.0f4e88",
+        "type": "mqtt in",
+        "z": "6d59f1a.522131",
+        "name": "",
+        "topic": "SWAN/pub",
+        "qos": "2",
+        "broker": "2fd62e77.0339c2",
+        "x": 227.51251983642578,
+        "y": 179.33749866485596,
+        "wires": [
+            [
+                "a1d3fe8f.8ebaf"
+            ]
+        ]
+    },
+    {
+        "id": "8bed1c18.49a33",
+        "type": "mqtt out",
+        "z": "6d59f1a.522131",
+        "name": "",
+        "topic": "SWAN/recv",
+        "qos": "1",
+        "retain": "false",
+        "broker": "28a5b569.d77cba",
+        "x": 722.5062255859375,
+        "y": 625.1937255859375,
+        "wires": []
+    },
+    {
+        "id": "eaddb61c.071e78",
+        "type": "function",
+        "z": "6d59f1a.522131",
+        "name": "Irrigation ban control",
+        "func": "if (msg.payload === true){\n    msg.payload = \"banned\";\n}\nelse {\n    msg.payload = \"enabled\";\n}\n\nreturn msg;",
+        "outputs": 1,
+        "noerr": 0,
+        "x": 528,
+        "y": 590,
+        "wires": [
+            [
+                "8bed1c18.49a33",
+                "a661d9ad.96fbb8"
+            ]
+        ]
+    },
+    {
+        "id": "a1d3fe8f.8ebaf",
+        "type": "json",
+        "z": "6d59f1a.522131",
+        "name": "",
+        "x": 406.0000228881836,
+        "y": 175.00000476837158,
+        "wires": [
+            [
+                "763a9912.36eb48"
+            ]
+        ]
+    },
+    {
+        "id": "ae71a16c.27909",
+        "type": "sqlite",
+        "z": "6d59f1a.522131",
+        "mydb": "ba3e9611.084d58",
+        "name": "Insert to table",
+        "x": 1016.0000381469727,
+        "y": 112.00001049041748,
+        "wires": [
+            [
+                "62ed1138.d3cac"
+            ]
+        ]
+    },
+    {
+        "id": "62ed1138.d3cac",
+        "type": "debug",
+        "z": "6d59f1a.522131",
+        "name": "",
+        "active": true,
+        "console": "false",
+        "complete": "false",
+        "x": 1224,
+        "y": 117.00000762939453,
+        "wires": []
+    },
+    {
+        "id": "60c050d.4ebedb",
+        "type": "function",
+        "z": "6d59f1a.522131",
+        "name": "SQL statement",
+        "func": "var topic = \" INSERT INTO \\\"SWAN\\\" (\\\"ID\\\"\\,\\\"moisture\\\"\\,\\\"temperature\\\"\\,\\\"pressure\\\"\\,\\\"status\\\"\\,\\\"battery\\\") VALUES ('\"+msg.payload[0]+\"\\'\\,\\'\"+msg.payload[1]+\"\\'\\,\\'\"+msg.payload[2]+\"\\'\\,\\'\"+msg.payload[3]+\"\\'\\,\\'\"+msg.payload[4]+\"\\'\\,\\'\"+msg.payload[5]+\"\\')\";\nvar newmsg={}\nnewmsg.topic = topic;\nreturn newmsg;",
+        "outputs": 1,
+        "noerr": 0,
+        "x": 829.0000228881836,
+        "y": 110.00000476837158,
+        "wires": [
+            [
+                "ae71a16c.27909"
+            ]
+        ]
+    },
+    {
+        "id": "6b913cb9.7caf74",
+        "type": "function",
+        "z": "6d59f1a.522131",
+        "name": "BuzzerControl",
+        "func": "if (msg.payload === true){\n    msg.payload = \"lost\";\n}\nelse {\n    msg.payload = \"found\";\n}\n\nreturn msg;",
+        "outputs": 1,
+        "noerr": 0,
+        "x": 527.4875564575195,
+        "y": 721.2249565124512,
+        "wires": [
+            [
+                "530ed1bd.e06dd",
+                "11c18dc3.34dbd2"
+            ]
+        ]
+    },
+    {
+        "id": "763a9912.36eb48",
+        "type": "function",
+        "z": "6d59f1a.522131",
+        "name": "Parse JSON",
+        "func": "var avgtemp;\nvar avgmoist;\nvar avgpres;\nvar status= msg.payload.status;\nvar id=msg.payload.Client;\nvar battery = msg.payload.Battery_Voltage;\n\navgtemp = (msg.payload.temp[0]+msg.payload.temp[1]+msg.payload.temp[2]+msg.payload.temp[3]+msg.payload.temp[4])/5;\navgpres = (msg.payload.pressure[0]+msg.payload.pressure[1]+msg.payload.pressure[2]+msg.payload.pressure[3]+msg.payload.pressure[4])/5;\navgmoist = (msg.payload.U_moisture[0]+msg.payload.U_moisture[1]+msg.payload.U_moisture[2]+msg.payload.U_moisture[3]+msg.payload.U_moisture[4])/5;\n\n\ntemp = avgtemp.toFixed(2);\npres = avgpres.toFixed(2);\nmoist = avgmoist.toFixed(2);\n\nvar data = {payload: [id,moist,temp,pres,status,battery]};\n\nreturn data;",
+        "outputs": 1,
+        "noerr": 0,
+        "x": 560.0000228881836,
+        "y": 179.00000476837158,
+        "wires": [
+            [
+                "60c050d.4ebedb",
+                "2269c0e3.3a41f",
+                "5b749fcb.7c33",
+                "46115a7e.d26234",
+                "44c871d1.ea296"
+            ]
+        ]
+    },
+    {
+        "id": "39c7b78f.20f178",
+        "type": "ui_chart",
+        "z": "6d59f1a.522131",
+        "name": "",
+        "group": "13e6c784.070128",
+        "order": 0,
+        "width": 0,
+        "height": 0,
+        "label": "Ambient temperature [°C]",
+        "chartType": "line",
+        "legend": "true",
+        "xformat": "HH:mm:ss",
+        "interpolate": "linear",
+        "nodata": "",
+        "ymin": "",
+        "ymax": "",
+        "removeOlder": 1,
+        "removeOlderPoints": "",
+        "removeOlderUnit": "86400",
+        "cutout": 0,
+        "colors": [
+            "#1f77b4",
+            "#aec7e8",
+            "#ff7f0e",
+            "#2ca02c",
+            "#98df8a",
+            "#d62728",
+            "#ff9896",
+            "#9467bd",
+            "#c5b0d5"
+        ],
+        "x": 1093.3483505249023,
+        "y": 239.72284412384033,
+        "wires": [
             [],
             []
         ]
     },
     {
-        id 9305274c.150d38,
-        type ui_chart,
-        z 6d59f1a.522131,
-        name ,
-        group 3ae508d0.221808,
-        order 0,
-        width 0,
-        height 0,
-        label Pressure [hPa],
-        chartType line,
-        legend true,
-        xformat HHmmss,
-        interpolate linear,
-        nodata ,
-        ymin ,
-        ymax ,
-        removeOlder 1,
-        removeOlderPoints ,
-        removeOlderUnit 86400,
-        cutout 0,
-        colors [
-            #1f77b4,
-            #aec7e8,
-            #ff7f0e,
-            #2ca02c,
-            #98df8a,
-            #d62728,
-            #ff9896,
-            #9467bd,
-            #c5b0d5
+        "id": "9305274c.150d38",
+        "type": "ui_chart",
+        "z": "6d59f1a.522131",
+        "name": "",
+        "group": "3ae508d0.221808",
+        "order": 0,
+        "width": 0,
+        "height": 0,
+        "label": "Pressure [hPa]",
+        "chartType": "line",
+        "legend": "true",
+        "xformat": "HH:mm:ss",
+        "interpolate": "linear",
+        "nodata": "",
+        "ymin": "",
+        "ymax": "",
+        "removeOlder": 1,
+        "removeOlderPoints": "",
+        "removeOlderUnit": "86400",
+        "cutout": 0,
+        "colors": [
+            "#1f77b4",
+            "#aec7e8",
+            "#ff7f0e",
+            "#2ca02c",
+            "#98df8a",
+            "#d62728",
+            "#ff9896",
+            "#9467bd",
+            "#c5b0d5"
         ],
-        x 1097.2257919311523,
-        y 287.26987171173096,
-        wires [
+        "x": 1097.2257919311523,
+        "y": 287.26987171173096,
+        "wires": [
             [],
             []
         ]
     },
     {
-        id c2b154d1.247148,
-        type ui_chart,
-        z 6d59f1a.522131,
-        name ,
-        group f3ee1910.217358,
-        order 0,
-        width 0,
-        height 0,
-        label Status,
-        chartType line,
-        legend true,
-        xformat HHmmss,
-        interpolate linear,
-        nodata ,
-        ymin ,
-        ymax ,
-        removeOlder 1,
-        removeOlderPoints ,
-        removeOlderUnit 86400,
-        cutout 0,
-        colors [
-            #1f77b4,
-            #aec7e8,
-            #ff7f0e,
-            #2ca02c,
-            #98df8a,
-            #d62728,
-            #ff9896,
-            #9467bd,
-            #c5b0d5
+        "id": "c2b154d1.247148",
+        "type": "ui_chart",
+        "z": "6d59f1a.522131",
+        "name": "",
+        "group": "f3ee1910.217358",
+        "order": 0,
+        "width": 0,
+        "height": 0,
+        "label": "Status",
+        "chartType": "line",
+        "legend": "true",
+        "xformat": "HH:mm:ss",
+        "interpolate": "linear",
+        "nodata": "",
+        "ymin": "",
+        "ymax": "",
+        "removeOlder": 1,
+        "removeOlderPoints": "",
+        "removeOlderUnit": "86400",
+        "cutout": 0,
+        "colors": [
+            "#1f77b4",
+            "#aec7e8",
+            "#ff7f0e",
+            "#2ca02c",
+            "#98df8a",
+            "#d62728",
+            "#ff9896",
+            "#9467bd",
+            "#c5b0d5"
         ],
-        x 1106.2315292358398,
-        y 340.26987171173096,
-        wires [
+        "x": 1106.2315292358398,
+        "y": 340.26987171173096,
+        "wires": [
             [],
             []
         ]
     },
     {
-        id 2269c0e3.3a41f,
-        type function,
-        z 6d59f1a.522131,
-        name Generate Temperature Chart Data,
-        func var msg1 = { payloadmsg.payload[2], topicmsg.payload[0] };nnreturn msg1;,
-        outputs 1,
-        noerr 0,
-        x 874.4587631225586,
-        y 229.0056505203247,
-        wires [
+        "id": "2269c0e3.3a41f",
+        "type": "function",
+        "z": "6d59f1a.522131",
+        "name": "Generate Temperature Chart Data",
+        "func": "var msg1 = { payload:msg.payload[2], topic:msg.payload[0] };\n\nreturn msg1;",
+        "outputs": 1,
+        "noerr": 0,
+        "x": 874.4587631225586,
+        "y": 229.0056505203247,
+        "wires": [
             [
-                39c7b78f.20f178
+                "39c7b78f.20f178"
             ]
         ]
     },
     {
-        id 5b749fcb.7c33,
-        type function,
-        z 6d59f1a.522131,
-        name Generate Pressure Chart Data,
-        func var msg1 = { payloadmsg.payload[3], topicmsg.payload[0] };nnreturn msg1;,
-        outputs 1,
-        noerr 0,
-        x 872.4587631225586,
-        y 290.0056505203247,
-        wires [
+        "id": "5b749fcb.7c33",
+        "type": "function",
+        "z": "6d59f1a.522131",
+        "name": "Generate Pressure Chart Data",
+        "func": "var msg1 = { payload:msg.payload[3], topic:msg.payload[0] };\n\nreturn msg1;",
+        "outputs": 1,
+        "noerr": 0,
+        "x": 872.4587631225586,
+        "y": 290.0056505203247,
+        "wires": [
             [
-                9305274c.150d38
+                "9305274c.150d38"
             ]
         ]
     },
     {
-        id 46115a7e.d26234,
-        type function,
-        z 6d59f1a.522131,
-        name Generate Status Chart Data,
-        func var msg1 = { payloadmsg.payload[4], topicmsg.payload[0] };nnreturn msg1;,
-        outputs 1,
-        noerr 0,
-        x 852.4587631225586,
-        y 341.0056505203247,
-        wires [
+        "id": "46115a7e.d26234",
+        "type": "function",
+        "z": "6d59f1a.522131",
+        "name": "Generate Status Chart Data",
+        "func": "var msg1 = { payload:msg.payload[4], topic:msg.payload[0] };\n\nreturn msg1;",
+        "outputs": 1,
+        "noerr": 0,
+        "x": 852.4587631225586,
+        "y": 341.0056505203247,
+        "wires": [
             [
-                c2b154d1.247148
+                "c2b154d1.247148"
             ]
         ]
     },
     {
-        id db0afbca.9f7698,
-        type mqtt in,
-        z 6d59f1a.522131,
-        name ,
-        topic SWANserial,
-        qos 2,
-        broker 2fd62e77.0339c2,
-        x 220.18183135986328,
-        y 738.4545907974243,
-        wires [
+        "id": "db0afbca.9f7698",
+        "type": "mqtt in",
+        "z": "6d59f1a.522131",
+        "name": "",
+        "topic": "SWAN/serial",
+        "qos": "2",
+        "broker": "2fd62e77.0339c2",
+        "x": 219.1818618774414,
+        "y": 871.4546241760254,
+        "wires": [
             [
-                88fa1667.fde628
+                "88fa1667.fde628"
             ]
         ]
     },
     {
-        id 88fa1667.fde628,
-        type function,
-        z 6d59f1a.522131,
-        name Process,
-        func msg.payload = parseInt(msg.payload);nnreturn msg;,
-        outputs 1,
-        noerr 0,
-        x 385.18182373046875,
-        y 734.4545736312866,
-        wires [
+        "id": "88fa1667.fde628",
+        "type": "function",
+        "z": "6d59f1a.522131",
+        "name": "Process",
+        "func": "msg.payload = parseInt(msg.payload);\n\nreturn msg;",
+        "outputs": 1,
+        "noerr": 0,
+        "x": 384.1818542480469,
+        "y": 867.4546070098877,
+        "wires": [
             [
-                f9c12a43.ea48f8,
-                bb8bc0b6.c2301
+                "f9c12a43.ea48f8",
+                "bb8bc0b6.c2301"
             ]
         ]
     },
     {
-        id f9c12a43.ea48f8,
-        type function,
-        z 6d59f1a.522131,
-        name SQL statement,
-        func var topic = SELECT MAX(key) AS maxkey FROM serialnumbers;nnvar newmsg={}nnewmsg.topic = topic;nreturn newmsg;,
-        outputs 1,
-        noerr 0,
-        x 576.4545288085938,
-        y 725.8182210922241,
-        wires [
+        "id": "f9c12a43.ea48f8",
+        "type": "function",
+        "z": "6d59f1a.522131",
+        "name": "SQL statement",
+        "func": "var topic = \"SELECT MAX(key) AS maxkey FROM serialnumbers\";\n\nvar newmsg={}\nnewmsg.topic = topic;\nreturn newmsg;",
+        "outputs": 1,
+        "noerr": 0,
+        "x": 575.4545593261719,
+        "y": 858.8182544708252,
+        "wires": [
             [
-                9574eb02.d4fcd8
+                "9574eb02.d4fcd8"
             ]
         ]
     },
     {
-        id 29271837.bcedd8,
-        type mqtt out,
-        z 6d59f1a.522131,
-        name ,
-        topic SWANrecv,
-        qos 1,
-        retain false,
-        broker 28a5b569.d77cba,
-        x 1082.858512878418,
-        y 878.9495077133179,
-        wires []
+        "id": "29271837.bcedd8",
+        "type": "mqtt out",
+        "z": "6d59f1a.522131",
+        "name": "",
+        "topic": "SWAN/recv",
+        "qos": "1",
+        "retain": "false",
+        "broker": "28a5b569.d77cba",
+        "x": 1133.8585510253906,
+        "y": 1024.9495573043823,
+        "wires": []
     },
     {
-        id 9574eb02.d4fcd8,
-        type sqlite,
-        z 6d59f1a.522131,
-        mydb ba3e9611.084d58,
-        name Select from serialnumbers table,
-        x 818.727294921875,
-        y 726.0000448226929,
-        wires [
+        "id": "9574eb02.d4fcd8",
+        "type": "sqlite",
+        "z": "6d59f1a.522131",
+        "mydb": "ba3e9611.084d58",
+        "name": "Select from serialnumbers table",
+        "x": 817.7273254394531,
+        "y": 859.000078201294,
+        "wires": [
             [
-                57683d24.d87694,
-                3619ef85.5df79
+                "57683d24.d87694",
+                "3619ef85.5df79"
             ]
         ]
     },
     {
-        id 57683d24.d87694,
-        type function,
-        z 6d59f1a.522131,
-        name Calculate new serialnumber,
-        func if (msg.payload[0].maxkey === null){n    msg.payload = 1;}nelse{msg.payload = msg.payload[0].maxkey + 1 };nnnnreturn msg;,
-        outputs 1,
-        noerr 0,
-        x 829.7070922851562,
-        y 806.8889303207397,
-        wires [
+        "id": "57683d24.d87694",
+        "type": "function",
+        "z": "6d59f1a.522131",
+        "name": "Calculate new serialnumber",
+        "func": "if (msg.payload[0].maxkey === null){\n    msg.payload = 1;}\nelse{\n    msg.payload = msg.payload[0].maxkey + 1\n    };\nreturn msg;",
+        "outputs": 1,
+        "noerr": 0,
+        "x": 828.7071228027344,
+        "y": 939.8889636993408,
+        "wires": [
             [
-                bb8bc0b6.c2301
+                "bb8bc0b6.c2301"
             ]
         ]
     },
     {
-        id 85a96246.ffceb,
-        type debug,
-        z 6d59f1a.522131,
-        name ,
-        active true,
-        console false,
-        complete false,
-        x 1078.8180694580078,
-        y 820.2222127914429,
-        wires []
+        "id": "85a96246.ffceb",
+        "type": "debug",
+        "z": "6d59f1a.522131",
+        "name": "",
+        "active": true,
+        "console": "false",
+        "complete": "false",
+        "x": 1117.8180847167969,
+        "y": 960.2222623825073,
+        "wires": []
     },
     {
-        id bb8bc0b6.c2301,
-        type join,
-        z 6d59f1a.522131,
-        name ,
-        mode custom,
-        build array,
-        property payload,
-        propertyType msg,
-        key topic,
-        joiner n,
-        timeout ,
-        count 2,
-        x 769.9191932678223,
-        y 874.0405583381653,
-        wires [
+        "id": "bb8bc0b6.c2301",
+        "type": "join",
+        "z": "6d59f1a.522131",
+        "name": "",
+        "mode": "custom",
+        "build": "array",
+        "property": "payload",
+        "propertyType": "msg",
+        "key": "topic",
+        "joiner": "\\n",
+        "timeout": "",
+        "count": "2",
+        "x": 768.9192237854004,
+        "y": 1007.0405917167664,
+        "wires": [
             [
-                48539478.3ecb9c
+                "48539478.3ecb9c"
             ]
         ]
     },
     {
-        id 48539478.3ecb9c,
-        type function,
-        z 6d59f1a.522131,
-        name Join strings,
-        func msg.payload = msg.payload[0].toString() + , + msg.payload[1].toString();nnreturn msg;,
-        outputs 1,
-        noerr 0,
-        x 914.1268539428711,
-        y 882.2285289764404,
-        wires [
+        "id": "48539478.3ecb9c",
+        "type": "function",
+        "z": "6d59f1a.522131",
+        "name": "Prepare message",
+        "func": "msg.payload = msg.payload[0].toString() + \"\\,\" + msg.payload[1].toString();\n\nreturn msg;",
+        "outputs": 1,
+        "noerr": 0,
+        "x": 933.1268844604492,
+        "y": 1015.2285623550415,
+        "wires": [
             [
-                85a96246.ffceb,
-                29271837.bcedd8
+                "85a96246.ffceb",
+                "29271837.bcedd8"
             ]
         ]
     },
     {
-        id 5399908d.3f64b,
-        type sqlite,
-        z 6d59f1a.522131,
-        mydb ba3e9611.084d58,
-        name Insert to table,
-        x 1263.5712890625,
-        y 729.4709310531616,
-        wires [
+        "id": "5399908d.3f64b",
+        "type": "sqlite",
+        "z": "6d59f1a.522131",
+        "mydb": "ba3e9611.084d58",
+        "name": "Insert to table",
+        "x": 1262.5713195800781,
+        "y": 862.4709644317627,
+        "wires": [
             [
-                6a10b5fd.af300c
+                "6a10b5fd.af300c"
             ]
         ]
     },
     {
-        id 3619ef85.5df79,
-        type function,
-        z 6d59f1a.522131,
-        name SQL statement,
-        func var tempnum = msg.payload[0].maxkey+1;nserialnumber = tempnum.toString();nnnvar topic =  INSERT INTO SERIALNUMBERS (key) VALUES ('+serialnumber+');nvar newmsg={}nnewmsg.topic = topic;nreturn newmsg;,
-        outputs 1,
-        noerr 0,
-        x 1080.0157470703125,
-        y 728.4709920883179,
-        wires [
+        "id": "3619ef85.5df79",
+        "type": "function",
+        "z": "6d59f1a.522131",
+        "name": "SQL statement",
+        "func": "var tempnum = msg.payload[0].maxkey+1;\nserialnumber = tempnum.toString();\n\n\nvar topic = \" INSERT INTO \\\"SERIALNUMBERS\\\" (\\\"key\\\") VALUES ('\"+serialnumber+\"\\')\";\nvar newmsg={}\nnewmsg.topic = topic;\nreturn newmsg;",
+        "outputs": 1,
+        "noerr": 0,
+        "x": 1079.0157775878906,
+        "y": 861.471025466919,
+        "wires": [
             [
-                5399908d.3f64b
+                "5399908d.3f64b"
             ]
         ]
     },
     {
-        id 6a10b5fd.af300c,
-        type debug,
-        z 6d59f1a.522131,
-        name ,
-        active true,
-        console false,
-        complete false,
-        x 1267.9552001953125,
-        y 776.3598470687866,
-        wires []
+        "id": "6a10b5fd.af300c",
+        "type": "debug",
+        "z": "6d59f1a.522131",
+        "name": "",
+        "active": true,
+        "console": "false",
+        "complete": "false",
+        "x": 1266.9552307128906,
+        "y": 909.3598804473877,
+        "wires": []
     },
     {
-        id 6ea42686.ec83b8,
-        type function,
-        z 6d59f1a.522131,
-        name SQL statement,
-        func var topic = SELECT  FROM SWAN ORDER BY primkey DESC;nnvar newmsg={}nnewmsg.topic = topic;nreturn newmsg;,
-        outputs 1,
-        noerr 0,
-        x 389,
-        y 456,
-        wires [
-            [
-                6f152052.432d1
-            ]
-        ]
-    },
-    {
-        id 6f152052.432d1,
-        type sqlite,
-        z 6d59f1a.522131,
-        mydb ba3e9611.084d58,
-        name Select from SWAN,
-        x 591.2727661132812,
-        y 456.18182373046875,
-        wires [
-            [
-                6282c440.f1b55c,
-                ab6035e7.3d6ba8
-            ]
-        ]
-    },
-    {
-        id ed47d5da.005fb8,
-        type inject,
-        z 6d59f1a.522131,
-        name ,
-        topic ,
-        payload ,
-        payloadType date,
-        repeat 60,
-        crontab ,
-        once false,
-        x 221,
-        y 458,
-        wires [
-            [
-                6ea42686.ec83b8
-            ]
-        ]
-    },
-    {
-        id 6282c440.f1b55c,
-        type debug,
-        z 6d59f1a.522131,
-        name ,
-        active false,
-        console false,
-        complete false,
-        x 779,
-        y 428,
-        wires []
-    },
-    {
-        id 626c28e3.8a00a8,
-        type ui_switch,
-        z 6d59f1a.522131,
-        name Ban,
-        label Ban irrigtaion,
-        group dafef2b4.2f5c4,
-        order 0,
-        width 0,
-        height 0,
-        passthru true,
-        decouple false,
-        topic switch,
-        style ,
-        onvalue true,
-        onvalueType bool,
-        onicon ,
-        oncolor ,
-        offvalue false,
-        offvalueType bool,
-        officon ,
-        offcolor ,
-        x 198,
-        y 573,
-        wires [
-            [
-                53d1c218.9f0e9c
-            ]
-        ]
-    },
-    {
-        id ad0a5883.57f108,
-        type mqtt in,
-        z 6d59f1a.522131,
-        name ,
-        topic SWANpub,
-        qos 2,
-        broker 2fd62e77.0339c2,
-        x 188,
-        y 618,
-        wires [
-            [
-                53d1c218.9f0e9c
-            ]
-        ]
-    },
-    {
-        id a661d9ad.96fbb8,
-        type debug,
-        z 6d59f1a.522131,
-        name ,
-        active true,
-        console false,
-        complete false,
-        x 721,
-        y 556,
-        wires []
-    },
-    {
-        id 11c18dc3.34dbd2,
-        type mqtt out,
-        z 6d59f1a.522131,
-        name ,
-        topic SWANrecv,
-        qos 1,
-        retain false,
-        broker 28a5b569.d77cba,
-        x 1433.506248474121,
-        y 627.0000286102295,
-        wires []
-    },
-    {
-        id a310e604.f4d7b8,
-        type ui_switch,
-        z 6d59f1a.522131,
-        name Buzzer,
-        label Find nodes,
-        group dafef2b4.2f5c4,
-        order 0,
-        width 0,
-        height 0,
-        passthru true,
-        decouple false,
-        topic switch,
-        style ,
-        onvalue true,
-        onvalueType bool,
-        onicon ,
-        oncolor ,
-        offvalue false,
-        offvalueType bool,
-        officon ,
-        offcolor ,
-        x 924.0000228881836,
-        y 569.806303024292,
-        wires [
-            [
-                662c0a65.7369a4
-            ]
-        ]
-    },
-    {
-        id df253c19.fb214,
-        type mqtt in,
-        z 6d59f1a.522131,
-        name ,
-        topic SWANpub,
-        qos 2,
-        broker 2fd62e77.0339c2,
-        x 925.0000267028809,
-        y 613.8063049316406,
-        wires [
-            [
-                662c0a65.7369a4
-            ]
-        ]
-    },
-    {
-        id 530ed1bd.e06dd,
-        type debug,
-        z 6d59f1a.522131,
-        name ,
-        active true,
-        console false,
-        complete false,
-        x 1432.0000228881836,
-        y 561.806303024292,
-        wires []
-    },
-    {
-        id ab6035e7.3d6ba8,
-        type ui_template,
-        z 6d59f1a.522131,
-        group 47a2bc87.45d204,
-        name ,
-        order 0,
-        width 0,
-        height 0,
-        format table style=width100%n  trn    thIDth n    thMoisture Voltage [V]thn    thTemperature [°C]th n    thPressure [hPa]thn    thStatusthn    thTimestampthn  trn  tr ng-repeat=x in msg.payload  limitTo1000n    td{{msg.payload[$index].id}}tdn    td{{msg.payload[$index].moisture}}td n    td{{msg.payload[$index].temperature}}tdn    td{{msg.payload[$index].pressure}}tdn    td{{msg.payload[$index].status}}tdn    td{{msg.payload[$index].timestamp}}tdn  trntable,
-        storeOutMessages true,
-        fwdInMessages true,
-        x 786,
-        y 474,
-        wires [
+        "id": "881356bc.dbc468",
+        "type": "file",
+        "z": "36cda2f3.36d9ae",
+        "name": "",
+        "filename": "",
+        "appendNewline": true,
+        "createDir": true,
+        "overwriteFile": "true",
+        "x": 690,
+        "y": 40,
+        "wires": [
             []
         ]
     },
     {
-        id 6f57a2c5.66045c,
-        type inject,
-        z 6d59f1a.522131,
-        name ,
-        topic DELETE FROM SWAN WHERE TIMESTAMP = strftime('%s','now', '-30 days')1000,
-        payload ,
-        payloadType date,
-        repeat 3600,
-        crontab ,
-        once false,
-        x 1045.9999923706055,
-        y 432.0000219345093,
-        wires [
+        "id": "84f401aa.e0982",
+        "type": "file in",
+        "z": "36cda2f3.36d9ae",
+        "name": "",
+        "filename": "",
+        "format": "utf8",
+        "x": 530,
+        "y": 80,
+        "wires": [
             [
-                210701c5.c37cfe
+                "59c36c07.6c9764"
             ]
         ]
     },
     {
-        id 210701c5.c37cfe,
-        type sqlite,
-        z 6d59f1a.522131,
-        mydb ba3e9611.084d58,
-        name Autodelete,
-        x 1213.9999923706055,
-        y 433.0000219345093,
-        wires [
+        "id": "de546da5.88255",
+        "type": "json",
+        "z": "36cda2f3.36d9ae",
+        "name": "",
+        "x": 530,
+        "y": 40,
+        "wires": [
             [
-                fd473389.ad242
+                "881356bc.dbc468"
             ]
         ]
     },
     {
-        id fd473389.ad242,
-        type debug,
-        z 6d59f1a.522131,
-        name ,
-        active true,
-        console false,
-        complete false,
-        x 1388.9999923706055,
-        y 437.0000219345093,
-        wires []
+        "id": "59c36c07.6c9764",
+        "type": "json",
+        "z": "36cda2f3.36d9ae",
+        "name": "",
+        "x": 690,
+        "y": 80,
+        "wires": [
+            []
+        ]
     },
     {
-        id 53d1c218.9f0e9c,
-        type function,
-        z 6d59f1a.522131,
-        name Store state,
-        func var state = context.get('state')  false;nnif (msg.topic == 'switch') {n    state = msg.payload;n    context.set('state', state);n}nnreturn {payload state};n,
-        outputs 1,
-        noerr 0,
-        x 338.1000061035156,
-        y 589.0000085830688,
-        wires [
+        "id": "7139e1ed.ec0d4",
+        "type": "function",
+        "z": "36cda2f3.36d9ae",
+        "name": "LoadSave",
+        "func": "var strSafe=msg.topic;\nif(strSafe)\n{\n    strSafe=strSafe.replace(/[^a-z0-9]/gi, '_').toLowerCase();\n    var loaded=context.get(strSafe)||0;\n    msg.filename =\"/home/pi/charts/\"+strSafe+\".dat\";\n    //node.warn(loaded);\n    if(0===loaded)\n    {\n        //load chart!! \n        msg.payload=\"load\";\n        context.set(strSafe,1);\n        \n        //node.warn(\"Loading \" +strSafe);\n    }\n    else\n    {\n        //node.warn(\"Writing \" +strSafe);\n    }\n    return msg;    \n}\nreturn null;\n\n",
+        "outputs": 1,
+        "noerr": 0,
+        "x": 230,
+        "y": 60,
+        "wires": [
             [
-                eaddb61c.071e78,
-                29c0fad0.5b2366
+                "def9c9ec.27a6f8"
             ]
         ]
     },
     {
-        id 662c0a65.7369a4,
-        type function,
-        z 6d59f1a.522131,
-        name Store state,
-        func var state = context.get('state')  false;nnif (msg.topic == 'switch') {n    state = msg.payload;n    context.set('state', state);n}nnreturn {payload state};n,
-        outputs 1,
-        noerr 0,
-        x 1081.0000534057617,
-        y 597.0000400543213,
-        wires [
-            [
-                6b913cb9.7caf74,
-                cff1d2b8.a12f3
-            ]
-        ]
-    },
-    {
-        id 369b130e.75ff5c,
-        type ui_chart,
-        z 6d59f1a.522131,
-        name ,
-        group 13e6c784.070128,
-        order 0,
-        width 0,
-        height 0,
-        label Moisture Voltage [V],
-        chartType line,
-        legend true,
-        xformat HHmmss,
-        interpolate linear,
-        nodata ,
-        ymin ,
-        ymax ,
-        removeOlder 1,
-        removeOlderPoints ,
-        removeOlderUnit 86400,
-        cutout 0,
-        colors [
-            #1f77b4,
-            #aec7e8,
-            #ff7f0e,
-            #2ca02c,
-            #98df8a,
-            #d62728,
-            #ff9896,
-            #9467bd,
-            #c5b0d5
+        "id": "def9c9ec.27a6f8",
+        "type": "switch",
+        "z": "36cda2f3.36d9ae",
+        "name": "Load data",
+        "property": "payload",
+        "propertyType": "msg",
+        "rules": [
+            {
+                "t": "neq",
+                "v": "load",
+                "vt": "str"
+            },
+            {
+                "t": "eq",
+                "v": "load",
+                "vt": "str"
+            }
         ],
-        x 1103.400047302246,
-        y 185.00000476837158,
-        wires [
+        "checkall": "false",
+        "outputs": 2,
+        "x": 380,
+        "y": 60,
+        "wires": [
+            [
+                "de546da5.88255"
+            ],
+            [
+                "84f401aa.e0982"
+            ]
+        ]
+    },
+    {
+        "id": "2ff49334.d1e2bc",
+        "type": "file",
+        "z": "2201aa0e.e4e236",
+        "name": "",
+        "filename": "",
+        "appendNewline": true,
+        "createDir": true,
+        "overwriteFile": "true",
+        "x": 690,
+        "y": 40,
+        "wires": [
+            []
+        ]
+    },
+    {
+        "id": "f838920a.50309",
+        "type": "file in",
+        "z": "2201aa0e.e4e236",
+        "name": "",
+        "filename": "",
+        "format": "utf8",
+        "x": 530,
+        "y": 80,
+        "wires": [
+            [
+                "d5c6dbf3.72bd18"
+            ]
+        ]
+    },
+    {
+        "id": "d45a1e07.588fa",
+        "type": "json",
+        "z": "2201aa0e.e4e236",
+        "name": "",
+        "x": 530,
+        "y": 40,
+        "wires": [
+            [
+                "2ff49334.d1e2bc"
+            ]
+        ]
+    },
+    {
+        "id": "d5c6dbf3.72bd18",
+        "type": "json",
+        "z": "2201aa0e.e4e236",
+        "name": "",
+        "x": 690,
+        "y": 80,
+        "wires": [
+            []
+        ]
+    },
+    {
+        "id": "5a6c68b8.86ef08",
+        "type": "function",
+        "z": "2201aa0e.e4e236",
+        "name": "LoadSave",
+        "func": "var strSafe=msg.topic;\nif(strSafe)\n{\n    strSafe=strSafe.replace(/[^a-z0-9]/gi, '_').toLowerCase();\n    var loaded=context.get(strSafe)||0;\n    msg.filename =\"/home/pi/charts/\"+strSafe+\".dat\";\n    //node.warn(loaded);\n    if(0===loaded)\n    {\n        //load chart!! \n        msg.payload=\"load\";\n        context.set(strSafe,1);\n        \n        //node.warn(\"Loading \" +strSafe);\n    }\n    else\n    {\n        //node.warn(\"Writing \" +strSafe);\n    }\n    return msg;    \n}\nreturn null;\n\n",
+        "outputs": 1,
+        "noerr": 0,
+        "x": 230,
+        "y": 60,
+        "wires": [
+            [
+                "8f107401.e5f088"
+            ]
+        ]
+    },
+    {
+        "id": "8f107401.e5f088",
+        "type": "switch",
+        "z": "2201aa0e.e4e236",
+        "name": "Load data",
+        "property": "payload",
+        "propertyType": "msg",
+        "rules": [
+            {
+                "t": "neq",
+                "v": "load",
+                "vt": "str"
+            },
+            {
+                "t": "eq",
+                "v": "load",
+                "vt": "str"
+            }
+        ],
+        "checkall": "false",
+        "outputs": 2,
+        "x": 380,
+        "y": 60,
+        "wires": [
+            [
+                "d45a1e07.588fa"
+            ],
+            [
+                "f838920a.50309"
+            ]
+        ]
+    },
+    {
+        "id": "6f152052.432d1",
+        "type": "sqlite",
+        "z": "6d59f1a.522131",
+        "mydb": "ba3e9611.084d58",
+        "name": "Select from SWAN",
+        "x": 725.2727890014648,
+        "y": 1122.1818313598633,
+        "wires": [
+            [
+                "6282c440.f1b55c",
+                "ab6035e7.3d6ba8"
+            ]
+        ]
+    },
+    {
+        "id": "ed47d5da.005fb8",
+        "type": "inject",
+        "z": "6d59f1a.522131",
+        "name": "Refresh",
+        "topic": "SELECT * FROM SWAN ORDER BY primkey DESC",
+        "payload": "",
+        "payloadType": "date",
+        "repeat": "60",
+        "crontab": "",
+        "once": false,
+        "x": 303.0000228881836,
+        "y": 1124.0000076293945,
+        "wires": [
+            [
+                "6f152052.432d1"
+            ]
+        ]
+    },
+    {
+        "id": "6282c440.f1b55c",
+        "type": "debug",
+        "z": "6d59f1a.522131",
+        "name": "",
+        "active": false,
+        "console": "false",
+        "complete": "false",
+        "x": 913.0000228881836,
+        "y": 1094.0000076293945,
+        "wires": []
+    },
+    {
+        "id": "dea1a0be.3e69",
+        "type": "change",
+        "z": "55af1125.23df4",
+        "name": "",
+        "rules": [
+            {
+                "t": "set",
+                "p": "action",
+                "pt": "msg",
+                "to": "restore",
+                "tot": "str"
+            }
+        ],
+        "action": "",
+        "property": "",
+        "from": "",
+        "to": "",
+        "reg": false,
+        "x": 589.5,
+        "y": 53,
+        "wires": [
+            []
+        ]
+    },
+    {
+        "id": "b2326dac.f1943",
+        "type": "json",
+        "z": "55af1125.23df4",
+        "name": "",
+        "x": 175.5,
+        "y": 85,
+        "wires": [
+            [
+                "dea1a0be.3e69"
+            ]
+        ]
+    },
+    {
+        "id": "f6518d35.8e9af",
+        "type": "catch",
+        "z": "55af1125.23df4",
+        "name": "",
+        "scope": [
+            "b2326dac.f1943"
+        ],
+        "x": 183.5,
+        "y": 117,
+        "wires": [
+            [
+                "ff7ec376.3a85"
+            ]
+        ]
+    },
+    {
+        "id": "ff7ec376.3a85",
+        "type": "change",
+        "z": "55af1125.23df4",
+        "name": "",
+        "rules": [
+            {
+                "t": "set",
+                "p": "payload",
+                "pt": "msg",
+                "to": "[]",
+                "tot": "json"
+            }
+        ],
+        "action": "",
+        "property": "",
+        "from": "",
+        "to": "",
+        "reg": false,
+        "x": 354.5,
+        "y": 116,
+        "wires": [
+            [
+                "dea1a0be.3e69"
+            ]
+        ]
+    },
+    {
+        "id": "e3ba1fd5.46f05",
+        "type": "inject",
+        "z": "55af1125.23df4",
+        "name": "Trigger restore",
+        "topic": "",
+        "payload": "",
+        "payloadType": "date",
+        "repeat": "",
+        "crontab": "",
+        "once": true,
+        "x": 618.5,
+        "y": 169,
+        "wires": [
+            []
+        ]
+    },
+    {
+        "id": "626c28e3.8a00a8",
+        "type": "ui_switch",
+        "z": "6d59f1a.522131",
+        "name": "Ban",
+        "label": "Ban irrigtaion",
+        "group": "dafef2b4.2f5c4",
+        "order": 0,
+        "width": 0,
+        "height": 0,
+        "passthru": true,
+        "decouple": "false",
+        "topic": "switch",
+        "style": "",
+        "onvalue": "true",
+        "onvalueType": "bool",
+        "onicon": "",
+        "oncolor": "",
+        "offvalue": "false",
+        "offvalueType": "bool",
+        "officon": "",
+        "offcolor": "",
+        "x": 198,
+        "y": 573,
+        "wires": [
+            [
+                "53d1c218.9f0e9c"
+            ]
+        ]
+    },
+    {
+        "id": "ad0a5883.57f108",
+        "type": "mqtt in",
+        "z": "6d59f1a.522131",
+        "name": "",
+        "topic": "SWAN/pub",
+        "qos": "2",
+        "broker": "2fd62e77.0339c2",
+        "x": 188,
+        "y": 618,
+        "wires": [
+            [
+                "53d1c218.9f0e9c"
+            ]
+        ]
+    },
+    {
+        "id": "a661d9ad.96fbb8",
+        "type": "debug",
+        "z": "6d59f1a.522131",
+        "name": "",
+        "active": true,
+        "console": "false",
+        "complete": "false",
+        "x": 721,
+        "y": 556,
+        "wires": []
+    },
+    {
+        "id": "11c18dc3.34dbd2",
+        "type": "mqtt out",
+        "z": "6d59f1a.522131",
+        "name": "",
+        "topic": "SWAN/recv",
+        "qos": "1",
+        "retain": "false",
+        "broker": "28a5b569.d77cba",
+        "x": 700.5062637329102,
+        "y": 753.9999809265137,
+        "wires": []
+    },
+    {
+        "id": "a310e604.f4d7b8",
+        "type": "ui_switch",
+        "z": "6d59f1a.522131",
+        "name": "Buzzer",
+        "label": "Find nodes",
+        "group": "dafef2b4.2f5c4",
+        "order": 0,
+        "width": 0,
+        "height": 0,
+        "passthru": true,
+        "decouple": "false",
+        "topic": "switch",
+        "style": "",
+        "onvalue": "true",
+        "onvalueType": "bool",
+        "onicon": "",
+        "oncolor": "",
+        "offvalue": "false",
+        "offvalueType": "bool",
+        "officon": "",
+        "offcolor": "",
+        "x": 191.00003814697266,
+        "y": 696.8062553405762,
+        "wires": [
+            [
+                "662c0a65.7369a4"
+            ]
+        ]
+    },
+    {
+        "id": "df253c19.fb214",
+        "type": "mqtt in",
+        "z": "6d59f1a.522131",
+        "name": "",
+        "topic": "SWAN/pub",
+        "qos": "2",
+        "broker": "2fd62e77.0339c2",
+        "x": 192.00004196166992,
+        "y": 740.8062572479248,
+        "wires": [
+            [
+                "662c0a65.7369a4"
+            ]
+        ]
+    },
+    {
+        "id": "530ed1bd.e06dd",
+        "type": "debug",
+        "z": "6d59f1a.522131",
+        "name": "",
+        "active": true,
+        "console": "false",
+        "complete": "false",
+        "x": 699.0000381469727,
+        "y": 688.8062553405762,
+        "wires": []
+    },
+    {
+        "id": "ab6035e7.3d6ba8",
+        "type": "ui_template",
+        "z": "6d59f1a.522131",
+        "group": "47a2bc87.45d204",
+        "name": "",
+        "order": 0,
+        "width": 0,
+        "height": 0,
+        "format": "<table style=\"width:100%\">\n  <tr>\n    <th>ID</th> \n    <th>Moisture Voltage [V]</th>\n    <th>Temperature [°C]</th> \n    <th>Pressure [hPa]</th>\n    <th>Status</th>\n    <th>Timestamp</th>\n  </tr>\n  <tr ng-repeat=\"x in msg.payload | limitTo:1000\">\n    <td>{{msg.payload[$index].id}}</td>\n    <td>{{msg.payload[$index].moisture}}</td> \n    <td>{{msg.payload[$index].temperature}}</td>\n    <td>{{msg.payload[$index].pressure}}</td>\n    <td>{{msg.payload[$index].status}}</td>\n    <td>{{msg.payload[$index].timestamp}}</td>\n  </tr>\n</table>",
+        "storeOutMessages": true,
+        "fwdInMessages": true,
+        "x": 920.0000228881836,
+        "y": 1140.0000076293945,
+        "wires": [
+            []
+        ]
+    },
+    {
+        "id": "6f57a2c5.66045c",
+        "type": "inject",
+        "z": "6d59f1a.522131",
+        "name": "Delete",
+        "topic": "DELETE FROM SWAN WHERE TIMESTAMP <= strftime('%s','now', '-30 days')*1000",
+        "payload": "",
+        "payloadType": "date",
+        "repeat": "3600",
+        "crontab": "",
+        "once": false,
+        "x": 348.00006103515625,
+        "y": 1198.3333721160889,
+        "wires": [
+            [
+                "210701c5.c37cfe"
+            ]
+        ]
+    },
+    {
+        "id": "210701c5.c37cfe",
+        "type": "sqlite",
+        "z": "6d59f1a.522131",
+        "mydb": "ba3e9611.084d58",
+        "name": "Autodelete",
+        "x": 526.0000610351562,
+        "y": 1199.3333721160889,
+        "wires": [
+            [
+                "fd473389.ad242"
+            ]
+        ]
+    },
+    {
+        "id": "fd473389.ad242",
+        "type": "debug",
+        "z": "6d59f1a.522131",
+        "name": "",
+        "active": true,
+        "console": "false",
+        "complete": "false",
+        "x": 701.0000610351562,
+        "y": 1203.3333721160889,
+        "wires": []
+    },
+    {
+        "id": "53d1c218.9f0e9c",
+        "type": "function",
+        "z": "6d59f1a.522131",
+        "name": "Store state",
+        "func": "var state = context.get('state') || false;\n\nif (msg.topic == 'switch') {\n    state = msg.payload;\n    context.set('state', state);\n}\n\nreturn {payload: state};\n",
+        "outputs": 1,
+        "noerr": 0,
+        "x": 338.1000061035156,
+        "y": 589.0000085830688,
+        "wires": [
+            [
+                "eaddb61c.071e78",
+                "29c0fad0.5b2366"
+            ]
+        ]
+    },
+    {
+        "id": "662c0a65.7369a4",
+        "type": "function",
+        "z": "6d59f1a.522131",
+        "name": "Store state",
+        "func": "var state = context.get('state') || false;\n\nif (msg.topic == 'switch') {\n    state = msg.payload;\n    context.set('state', state);\n}\n\nreturn {payload: state};\n",
+        "outputs": 1,
+        "noerr": 0,
+        "x": 348.0000686645508,
+        "y": 723.9999923706055,
+        "wires": [
+            [
+                "6b913cb9.7caf74",
+                "cff1d2b8.a12f3"
+            ]
+        ]
+    },
+    {
+        "id": "369b130e.75ff5c",
+        "type": "ui_chart",
+        "z": "6d59f1a.522131",
+        "name": "",
+        "group": "13e6c784.070128",
+        "order": 0,
+        "width": 0,
+        "height": 0,
+        "label": "Moisture Voltage [V]",
+        "chartType": "line",
+        "legend": "true",
+        "xformat": "HH:mm:ss",
+        "interpolate": "linear",
+        "nodata": "",
+        "ymin": "",
+        "ymax": "",
+        "removeOlder": 1,
+        "removeOlderPoints": "",
+        "removeOlderUnit": "86400",
+        "cutout": 0,
+        "colors": [
+            "#1f77b4",
+            "#aec7e8",
+            "#ff7f0e",
+            "#2ca02c",
+            "#98df8a",
+            "#d62728",
+            "#ff9896",
+            "#9467bd",
+            "#c5b0d5"
+        ],
+        "x": 1103.400047302246,
+        "y": 185.00000476837158,
+        "wires": [
             [],
             []
         ]
     },
     {
-        id 44c871d1.ea296,
-        type function,
-        z 6d59f1a.522131,
-        name Generate Moisture Chart Data,
-        func var msg1 = { payloadmsg.payload[1], topicmsg.payload[0] };nnreturn msg1;,
-        outputs 1,
-        noerr 0,
-        x 874.5104598999023,
-        y 174.28281116485596,
-        wires [
+        "id": "44c871d1.ea296",
+        "type": "function",
+        "z": "6d59f1a.522131",
+        "name": "Generate Moisture Chart Data",
+        "func": "var msg1 = { payload:msg.payload[1], topic:msg.payload[0] };\n\nreturn msg1;",
+        "outputs": 1,
+        "noerr": 0,
+        "x": 874.5104598999023,
+        "y": 174.28281116485596,
+        "wires": [
             [
-                369b130e.75ff5c
+                "369b130e.75ff5c"
             ]
         ]
     },
     {
-        id cff1d2b8.a12f3,
-        type debug,
-        z 6d59f1a.522131,
-        name ,
-        active false,
-        console false,
-        complete payload,
-        x 1257.0000228881836,
-        y 547.0000286102295,
-        wires []
+        "id": "cff1d2b8.a12f3",
+        "type": "debug",
+        "z": "6d59f1a.522131",
+        "name": "",
+        "active": false,
+        "console": "false",
+        "complete": "payload",
+        "x": 524.0000381469727,
+        "y": 673.9999809265137,
+        "wires": []
     },
     {
-        id 29c0fad0.5b2366,
-        type debug,
-        z 6d59f1a.522131,
-        name ,
-        active false,
-        console false,
-        complete payload,
-        x 489,
-        y 543,
-        wires []
-    },
-    {
-        id 2fd62e77.0339c2,
-        type mqtt-broker,
-        z ,
-        broker localhost,
-        port 1883,
-        clientid ,
-        usetls false,
-        compatmode true,
-        keepalive 60,
-        cleansession true,
-        willTopic ,
-        willQos 0,
-        willPayload ,
-        birthTopic ,
-        birthQos 0,
-        birthPayload 
-    },
-    {
-        id 28a5b569.d77cba,
-        type mqtt-broker,
-        z ,
-        broker localhost,
-        port 1883,
-        clientid ,
-        usetls false,
-        compatmode true,
-        keepalive 60,
-        cleansession true,
-        willTopic ,
-        willQos 0,
-        willPayload ,
-        birthTopic ,
-        birthQos 0,
-        birthPayload 
-    },
-    {
-        id ba3e9611.084d58,
-        type sqlitedb,
-        z ,
-        db homepidbsiot.db
-    },
-    {
-        id 13e6c784.070128,
-        type ui_group,
-        z ,
-        name Temperature,
-        tab 4ee076c3.476788,
-        order 1,
-        disp false,
-        width 6
-    },
-    {
-        id 3ae508d0.221808,
-        type ui_group,
-        z ,
-        name Pressure,
-        tab 4ee076c3.476788,
-        order 3,
-        disp false,
-        width 6
-    },
-    {
-        id f3ee1910.217358,
-        type ui_group,
-        z ,
-        name Status,
-        tab 4ee076c3.476788,
-        order 5,
-        disp false,
-        width 6
-    },
-    {
-        id dafef2b4.2f5c4,
-        type ui_group,
-        z ,
-        name Button,
-        tab 4ee076c3.476788,
-        order 6,
-        disp false,
-        width 6
-    },
-    {
-        id 47a2bc87.45d204,
-        type ui_group,
-        z ,
-        name Table,
-        tab 29a3f648.935d5a,
-        order 1,
-        disp true,
-        width 22
-    },
-    {
-        id 4ee076c3.476788,
-        type ui_tab,
-        z ,
-        name SWAN_SERVER,
-        icon dashboard,
-        order 1
-    },
-    {
-        id 29a3f648.935d5a,
-        type ui_tab,
-        z ,
-        name Database,
-        icon dashboard,
-        order 2
+        "id": "29c0fad0.5b2366",
+        "type": "debug",
+        "z": "6d59f1a.522131",
+        "name": "",
+        "active": false,
+        "console": "false",
+        "complete": "payload",
+        "x": 489,
+        "y": 543,
+        "wires": []
     }
 ]
