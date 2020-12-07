@@ -22,7 +22,8 @@ unsigned int serialNumber; //serial number of client
 bool banned = false;  // if true client won't actuate
 bool frozen = false;  // if true client won't actuate
 bool lost = false; // if true client runs buzzer 
-int irrigatonStatus; // 
+int irrigatonStatus; //
+bool doneMeasurement = false; 
 
 /*Wifi and MQTT client instances*/
 WiFiClient espClient;
@@ -36,7 +37,7 @@ TaskHandle_t buzzer_TaskHandle = NULL;
 TaskHandle_t irrigation_TaskHandle = NULL;
 TaskHandle_t MQTT_TaskHandle = NULL;
 
-/*Mutex*/
+/*Mutexes*/
 SemaphoreHandle_t measurementMutex;
 
 void setup() { //Run once after every reset
@@ -57,7 +58,7 @@ void setup() { //Run once after every reset
      delay(10);
      ESP.restart();
    }
-
+    
    //Create mutex to block MQTT task while measurements are made
    measurementMutex = xSemaphoreCreateMutex();
 

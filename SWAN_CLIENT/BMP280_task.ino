@@ -9,7 +9,6 @@ int device_address = 0x76; //I2C address
 RTC_DATA_ATTR float temp[5]; //Temperature values [°C]
 RTC_DATA_ATTR float pressure[5]; //Pressure values [hPa]
 
-
 void BMP280_TASK(void *pvParameters){
     unsigned long retryTime = 300000;   //5*6*10*1000*1ms = 5min
     bool status; //I2C device status
@@ -28,16 +27,20 @@ void BMP280_TASK(void *pvParameters){
     BMP280_Sleep(0x76);
 
     while(1) {
+    doneMeasurement = false;
     Serial.println();
     Serial.println("BMP280_TASK begins");
     
     bmp.begin(device_address);
     Serial.println("BMP280 to Normal mode...");
 
-    if(measurementCounter <5){//Read measurements in normal mode
+    while(measurementCounter > 4){vTaskDelay(100);}
+
+    if(measurementCounter < 5 ){//Read measurements in normal mode
        temp[measurementCounter] = bmp.readTemperature();
        pressure[measurementCounter] = bmp.readPressure() / 100.0F;
-      }
+       doneMeasurement = true;
+    }   
 
     for(int i=0;i<5;i++){
       avgTemp += temp[i]; //Calculate average temperature
@@ -45,7 +48,11 @@ void BMP280_TASK(void *pvParameters){
     avgTemp = avgTemp / 5;
 
     //If temperature is under 5°C, ambient temperature can be below 0°C
-    if( (avgTemp - 5.0)< 0.01 ){frozen = true;} 
+    if( (avgTemp - 5.0)< 0.01 ){
+      Serial.println("I'm frozen");
+      frozen = true;
+      }
+    else{frozen = false;} 
     
     printValues();
 

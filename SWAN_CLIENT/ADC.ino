@@ -1,5 +1,7 @@
 #include "ADC.h"
 
+#define SQR 25
+
  float Vin= 0.0; //Power supply voltage [V]
  RTC_DATA_ATTR float U_Moisture[5]; //Moisture sensor voltage [V]
  float Ubat = 0.0; //battery voltage [V]
@@ -10,32 +12,31 @@
 
 void ADC_TASK(void *pvParameters){
 
+  const int freq = 1500000;  //Hz
+  const int channel = 0;
+  const int resolution = 2; //Resolution 8, 10, 12, 15
+  const int dutycycle = 2; //50%
+
   //Take mutex
   xSemaphoreTake(measurementMutex, portMAX_DELAY); 
+
+  ledcSetup(channel, freq, resolution);
+  ledcAttachPin(SQR, channel);
+  ledcWrite(channel, dutycycle);
   
   while(1){
     if(measurementCounter==5){//Cyclic index
       measurementCounter=0;
       }
-    
-    dacWrite(26, 127);//Set 1.65V as reference
-    digitalWrite(2,LOW); //Enable opamps
-    vTaskDelay(500); //Wait for transiants
-    
+     
     Serial.println();
     Serial.println("ADC_TASK begins");
 
     //Measure mmoisture sensor voltage
-    U_Moisture[measurementCounter] = (float)( analogRead(ADC1_CH0) / 4095);
+    U_Moisture[measurementCounter] = (float)( (analogRead(ADC1_CH0)*3.3) / 4095);
 
     //Measure battery voltage
-    Ubat = (float)( analogRead(ADC1_CH3) / 4095);
-
-    //Measure power supply voltage
-    Vin = (float)( analogRead(ADC1_CH6) / 4095);
-
-    //Disable opamps
-    digitalWrite(2,HIGH);
+    Ubat = (float)( (analogRead(ADC1_CH3)*3.3) / 4095);
 
     /*Serial logging*/
     Serial.print("Voltage of soil moisture sensor: ");
@@ -54,6 +55,7 @@ void ADC_TASK(void *pvParameters){
     Serial.println(" V");
 
     //Increment measureindex
+    while(doneMeasurement == false){vTaskDelay(100);}
     measurementCounter++;
 
     /*When 5 measurements are taken,
